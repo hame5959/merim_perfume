@@ -1,0 +1,366 @@
+<%@page import="jenkim49.jumun.Jumun"%>
+<%@page import="java.util.List"%>
+<%@page import="jenkim49.member.Member"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%
+	Member member = (Member)request.getAttribute("member");
+	System.err.println(member.getM_id());
+	if(member==null){
+		response.sendRedirect("1index");
+	}
+	String MSG = (String)request.getAttribute("MSG");
+	if(MSG==null) MSG = "";
+	List<Jumun> jumunList = (List<Jumun>)session.getAttribute("jumunList");
+	if(jumunList==null) MSG = "주문내역이 없습니다.";
+	
+	
+
+%>
+
+<%@include file="api/daumapi.jsp"%>
+<!DOCTYPE html>
+<html lang="zxx" class="no-js">
+<head>
+<jsp:include page="member_login_check.jspf"/>
+
+<script src="js/vendor/jquery-2.2.4.min.js"></script>
+<script type="text/javascript">
+$(function() {
+	jumun_list();
+});
+
+function jumun_list() {
+    $.ajax({
+	url : "jumun_list_member",
+	method : "POST",
+	data : {},
+	dataType : "json",
+	success : function(textData) {
+		var html = "";
+		var jsonArray = textData;
+		html += "<table class=\"table table-hover\">";
+		html +=	"<thead>";
+		html += "<th>번호</th>";
+		html += "<th>주문명</th>";
+		html +=	"<th>전체수량</th>";
+		html +=	"<th>전체금액</th>";
+		html +=	"<th>주문날짜</th>";
+		html +=	"<th>회원아이디</th>";
+		html +=	"</thead>";
+		for (var i = 0; i < jsonArray.length; i++) {
+			var jumunJsonObject = jsonArray[i];
+			html += "<tr>";
+			html += "<th>" + jumunJsonObject.j_no + "</td>";
+			html += "<td>" + jumunJsonObject.j_name + "</td>";
+			html += "<td>" + jumunJsonObject.j_total_qty + "</td>";
+			html += "<td>" + jumunJsonObject.j_total_price + "</td>";
+			html += "<td>" + jumunJsonObject.j_date + "</td>";
+			html += "<td>" + jumunJsonObject.m_id + "</td>";
+			html += "</tr>";
+		}
+			html += "</table>";
+			$('#list').html(html);
+	}
+});
+}
+
+</script>
+<!-- Mobile Specific Meta -->
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- Favicon-->
+<link rel="shortcut icon" href="img/fav.png">
+<!-- Author Meta -->
+<meta name="author" content="CodePixar">
+<!-- Meta Description -->
+<meta name="description" content="">
+<!-- Meta Keyword -->
+<meta name="keywords" content="">
+<!-- meta character set -->
+<meta charset="UTF-8">
+<!-- Site Title -->
+<title>Shop</title>
+
+<link
+	href="https://fonts.googleapis.com/css?family=Poppins:100,200,400,300,500,600,700"
+	rel="stylesheet">
+<!--
+            CSS
+            ============================================= -->
+<link rel="stylesheet" href="css/linearicons.css">
+<link rel="stylesheet" href="css/owl.carousel.css">
+<link rel="stylesheet" href="css/font-awesome.min.css">
+<link rel="stylesheet" href="css/nice-select.css">
+<link rel="stylesheet" href="css/ion.rangeSlider.css" />
+<link rel="stylesheet" href="css/ion.rangeSlider.skinFlat.css" />
+<link rel="stylesheet" href="css/bootstrap.css">
+<link rel="stylesheet" href="css/main.css">
+
+</head>
+<body>
+
+	<!-- Start Header Area -->
+	<jsp:include page="1include_common_header.jsp" />
+	<!-- End Header Area -->
+
+	<!-- Start Banner Area -->
+	<jsp:include page="banner.jsp" />
+	<!-- End Banner Area -->
+
+	<!-- Start My Account -->
+	<div class="container">
+		
+			<div class="col-md-12">
+				
+					<h3 class="billing-title text-center">My Page</h3>
+					<p class="text-center mt-40 mb-40">Welcome! This is your account</p>
+					<form name="f">
+					<input type="hidden" name="m_no" value="<%=member.getM_no() %>">
+					<input type="hidden" name="m_id" value="<%=member.getM_id() %>">
+						<div class="form-group">
+							<label class="col-sm-2 control-label">ID</label>
+							<div class="col-sm-10">
+								<p class="form-control-static"><%=member.getM_id() %></p>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="inputPassword" class="col-sm-2 control-label">Password</label>
+							<div class="col-sm-10">
+								<input name="m_password" type="password" class="form-control" id="inputPassword"
+									placeholder="Password">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-2 control-label">이름</label>
+							<div class="col-sm-10">
+								<input name="m_name" type="text" class="form-control" id="m_name"
+									value="<%=member.getM_name()%>" disabled="disabled">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">연락처</label>
+							<div class="col-sm-10">
+								<input name="m_contact" type="text" class="form-control" id="m_contact"
+									value="<%=member.getM_contact()%>">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">이메일</label>
+							<div class="col-sm-10">
+								<input name="m_email" type="text" class="form-control" id="m_eamil"
+									value="<%=member.getM_email()%>">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">주소</label>
+							<div class="col-sm-10">
+								<input name="m_address" type="text" class="form-control" id="m_address"
+									value="<%=member.getM_address()%>" disabled="disabled">
+							</div>
+						</div>
+							
+					</form>
+					
+      
+      
+      
+    </div>
+					<div class="button-group" align="center">
+					<button class="view-btn color-2 mt-20 w-40" onclick="member_update_action()"><span>회원정보 수정</span></button>
+					<button class="view-btn color-2 mt-20 w-40" onclick="member_delete_action()"><span>회원탈퇴</span></button>
+					</div>
+				
+			</div>
+			<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<div>
+			
+			<h3 class="billing-title text-center">Order List</h3>
+					<p class="text-center mt-40 mb-40">This is your order list</p>
+					<div id="list">
+					</div>
+					<p align="center"><%= MSG %><p>
+			
+			
+			</div>
+			
+			
+		
+	</div>
+	
+	<!-- End My Account -->
+
+
+	<!-- Start Most Search Product Area -->
+	<section class="section-half">
+		<div class="container">
+			<div class="organic-section-title text-center">
+				<h3>Most Searched Products</h3>
+			</div>
+			<div class="row mt-30">
+				<div class="col-lg-3 col-md-4 col-sm-6">
+					<div class="single-search-product d-flex">
+						<a href="#"><img src="img/r1.jpg" alt=""></a>
+						<div class="desc">
+							<a href="#" class="title">Pixelstore fresh Blueberry</a>
+							<div class="price">
+								<span class="lnr lnr-tag"></span> $240.00
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-4 col-sm-6">
+					<div class="single-search-product d-flex">
+						<a href="#"><img src="img/r2.jpg" alt=""></a>
+						<div class="desc">
+							<a href="#" class="title">Pixelstore fresh Cabbage</a>
+							<div class="price">
+								<span class="lnr lnr-tag"></span> $189.00
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-4 col-sm-6">
+					<div class="single-search-product d-flex">
+						<a href="#"><img src="img/r3.jpg" alt=""></a>
+						<div class="desc">
+							<a href="#" class="title">Pixelstore fresh Raspberry</a>
+							<div class="price">
+								<span class="lnr lnr-tag"></span> $189.00
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-4 col-sm-6">
+					<div class="single-search-product d-flex">
+						<a href="#"><img src="img/r4.jpg" alt=""></a>
+						<div class="desc">
+							<a href="#" class="title">Pixelstore fresh Kiwi</a>
+							<div class="price">
+								<span class="lnr lnr-tag"></span> $189.00
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-4 col-sm-6">
+					<div class="single-search-product d-flex">
+						<a href="#"><img src="img/r5.jpg" alt=""></a>
+						<div class="desc">
+							<a href="#" class="title">Pixelstore Bell Pepper</a>
+							<div class="price">
+								<span class="lnr lnr-tag"></span> $120.00
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-4 col-sm-6">
+					<div class="single-search-product d-flex">
+						<a href="#"><img src="img/r6.jpg" alt=""></a>
+						<div class="desc">
+							<a href="#" class="title">Pixelstore fresh Blackberry</a>
+							<div class="price">
+								<span class="lnr lnr-tag"></span> $120.00
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-4 col-sm-6">
+					<div class="single-search-product d-flex">
+						<a href="#"><img src="img/r7.jpg" alt=""></a>
+						<div class="desc">
+							<a href="#" class="title">Pixelstore fresh Brocoli</a>
+							<div class="price">
+								<span class="lnr lnr-tag"></span> $120.00
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-4 col-sm-6">
+					<div class="single-search-product d-flex">
+						<a href="#"><img src="img/r8.jpg" alt=""></a>
+						<div class="desc">
+							<a href="#" class="title">Pixelstore fresh Carrot</a>
+							<div class="price">
+								<span class="lnr lnr-tag"></span> $120.00
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-4 col-sm-6">
+					<div class="single-search-product d-flex">
+						<a href="#"><img src="img/r9.jpg" alt=""></a>
+						<div class="desc">
+							<a href="#" class="title">Pixelstore fresh Strawberry</a>
+							<div class="price">
+								<span class="lnr lnr-tag"></span> $240.00
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-4 col-sm-6">
+					<div class="single-search-product d-flex">
+						<a href="#"><img src="img/r10.jpg" alt=""></a>
+						<div class="desc">
+							<a href="#" class="title">Prixma MG2 Light Inkjet</a>
+							<div class="price">
+								<span class="lnr lnr-tag"></span> $240.00
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-4 col-sm-6">
+					<div class="single-search-product d-flex">
+						<a href="#"><img src="img/r11.jpg" alt=""></a>
+						<div class="desc">
+							<a href="#" class="title">Pixelstore fresh Cherry</a>
+							<div class="price">
+								<span class="lnr lnr-tag"></span> $240.00
+								<del>$340.00</del>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-4 col-sm-6">
+					<div class="single-search-product d-flex">
+						<a href="#"><img src="img/r12.jpg" alt=""></a>
+						<div class="desc">
+							<a href="#" class="title">Pixelstore fresh Beans</a>
+							<div class="price">
+								<span class="lnr lnr-tag"></span> $240.00
+								<del>$340.00</del>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!-- End Most Search Product Area -->
+
+	<!-- start footer Area -->
+	<jsp:include page="footer.jsp" />
+	<!-- End footer Area -->
+
+	
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"
+		integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"
+		crossorigin="anonymous"></script>
+	<script src="js/vendor/bootstrap.min.js"></script>
+	<script src="js/jquery.ajaxchimp.min.js"></script>
+	<script src="js/jquery.nice-select.min.js"></script>
+	<script src="js/jquery.sticky.js"></script>
+	<script src="js/ion.rangeSlider.js"></script>
+	<script src="js/jquery.magnific-popup.min.js"></script>
+	<script src="js/owl.carousel.min.js"></script>
+	<script src="js/main.js"></script>
+	<script src="js/member.js"></script>
+
+</body>
+</html>

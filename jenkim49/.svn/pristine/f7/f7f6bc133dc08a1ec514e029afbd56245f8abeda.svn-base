@@ -1,0 +1,388 @@
+ function checkoutInsertDirect() {
+	 var checkRow = "";
+     $("[name='checkOne']:checked").each(function() {
+        checkRow = checkRow + $(this).val() + ",";
+     });
+     checkRow = checkRow.substring(0, checkRow.lastIndexOf(","));
+     
+     if (checkRow == '') {
+        alert("please select item");
+        return false;
+  
+     }
+     
+     console.log("### checkRow => {}" + checkRow);
+     if (confirm("Do you want to delete?")) {
+         
+            
+            $.ajax({
+               url : 'jumun_insert_action_directly',
+               type : 'POST',
+               dataType : 'text',
+               data : {
+                  j_name : $("[name=p_name]").val(),
+                  j_total_qty : $("[name=j_total_qty]").val(),
+                  j_total_price : ($("[name=j_total_qty]").val()*$("[name=j_total_price_init]").val()),
+                  m_id : "jenkim49",
+                  jd_item_qty : $("[name=j_total_qty]").val(),
+                  jd_items_price : ($("[name=j_total_qty]").val()*$("[name=j_total_price_init]").val()),
+                  p_no : $("[name=p_no]").val()
+               },
+               success : function(data) {
+                  alert("success");
+               }
+            })
+
+         }
+      }
+
+   function allCheckFunc(obj) {
+      $("[name=checkOne]").prop("checked", $(obj).prop("checked"));
+      $("[name=cart_price]").prop("checked", $(obj).prop("checked"));
+   }
+
+   function oneCheckFunc(obj) {
+      var allObj = $("[name=checkAll]");
+      var objName = $(obj).attr("name");
+      var checked='';
+      if ($(obj).prop("checked")) {
+         checkBoxLength = $("[name=" + objName + "]").length;
+         checkedLength = $("[name=" + objName + "]:checked").length;
+
+         if (checkBoxLength == checkedLength) {
+            allObj.prop("checked", true);
+         } else {
+            allObj.prop("checked", false);
+         }
+      } else {
+         allObj.prop("checked", false);
+      }
+   }
+
+   $(function() {
+      $("[name=checkAll]").click(function() {
+         allCheckFunc(this);
+         sumAlltotalPrice();
+      });
+      $("[name=checkOne]").each(function() {
+         $(this).click(function() {
+            oneCheckFunc($(this));
+            sumtotalPrice();
+         });
+      });
+      
+   });
+   function sumAlltotalPrice() {
+	      var checkRow =[];
+	      $("input:checkbox[name=checkOne]:checked").each(function(i,elements) {
+	    	  index=$(elements).index("input:checkbox[name=checkOne]");
+	         checkRow.push(parseInt($("[name=checkppp]").eq(index).val()));	
+	          });
+	    
+	      const array1 = checkRow;
+	      const reducer = (accumulator, currentValue) => accumulator + currentValue;
+	     $('#subtotal').text(array1.reduce(reducer));
+	         if (checkRow == '') {
+	            alert("please select item");
+	            return false;
+
+	         }
+	      
+
+	      // $('.subtotal').text('dasd');
+	   
+
+
+	   }
+
+   function sumtotalPrice() {
+      var checkRow =[];
+      $("input:checkbox[name=checkOne]:checked").each(function(i,elements) {
+    	  index=$(elements).index("input:checkbox[name=checkOne]");
+         checkRow.push(parseInt($("[name=checkppp]").eq(index).val()));	
+          });
+    
+      const array1 = checkRow;
+      const reducer = (accumulator, currentValue) => accumulator + currentValue;
+     $('.subtotal').text(array1.reduce(reducer));
+         if (checkRow == '') {
+            alert("please select item");
+            return false;
+
+         }
+      
+
+      // $('.subtotal').text('dasd');
+   
+
+
+   }
+   function deleteDirect() {
+      var checkRow = "";
+      $("[name='checkOne']:checked").each(function() {
+         checkRow = checkRow + $(this).val() + ",";
+      });
+      checkRow = checkRow.substring(0, checkRow.lastIndexOf(","));
+      
+      if (checkRow == '') {
+         alert("please select item");
+         return false;
+   
+      }
+      
+      console.log("### checkRow => {}" + checkRow);
+      if (confirm("Do you want to delete?"+checkRow)) {
+          
+            $.ajax({
+                  url : 'cart_delete_action_one',
+                  type : 'POST',
+                  dataType : 'text',
+                  data : {
+                     cart_no : checkRow,
+                     m_id: "jenkim49"
+                  },
+                  success : function(data) {
+                     alert("success");
+                  }
+               })
+
+            
+
+      }
+   }
+   
+   
+   
+
+   
+   
+   
+    // ------- Start Quantity Increase & Decrease Value --------//
+
+    function addComma(num) {
+       var regexp = /\B(?=(\d{3})+(?!\d))/g;
+       return num.toString().replace(regexp, ',');
+     }
+
+  
+    var value,
+        quantity = document.getElementsByClassName('cart-single-item');
+   
+    var total,price= document.getElementsByClassName('price');
+    var totalArray=[];
+    var totals=[];
+    totals.push($('.priceppp').text());
+     
+    // $(".subtotal").text(totals);
+       
+    function createBindings(quantityContainer) {
+       
+        var quantityAmount = quantityContainer.getElementsByClassName('quantity-amount')[0];
+        var priceAmount=quantityContainer.getElementsByClassName('pricepp')[0];
+        var priceAmount2=quantityContainer.getElementsByClassName('priceppp')[0];
+       const priceAmount3=quantityContainer.getElementsByClassName('pricepppp')[0];
+        var increase = quantityContainer.getElementsByClassName('increase')[0];
+        var decrease = quantityContainer.getElementsByClassName('decrease')[0];
+       var update =quantityContainer.getElementsByClassName('update')[0];
+        increase.addEventListener('click', function ()
+              {
+           increaseValue(quantityAmount,priceAmount,priceAmount2,priceAmount3,totalArray);
+           
+              // totalArray.push(totals);
+               
+               
+           // cartUpdate();
+
+           
+           });
+        update.addEventListener('click', function () {
+           updateValue(priceAmount,quantityAmount); 
+                  
+       });
+        decrease.addEventListener('click', function () {
+           decreaseValue(quantityAmount,priceAmount,priceAmount2,priceAmount3); 
+     
+           });
+    }
+
+  
+    
+    function init() {
+        for (var i = 0; i < quantity.length; i++ ) {
+            createBindings(quantity[i]);
+      
+        }
+    };
+    
+function updateValue(priceAmount,quantityAmount){
+   
+   var checkRow = "";
+    	    var arr= new Array();
+    	     var obj=new Object();
+   $("[name='checkOne']:checked").each(function() {
+      checkRow = checkRow + $(this).val() + ",";
+   });
+   checkRow = checkRow.substring(0, checkRow.lastIndexOf(","));
+   
+   if (checkRow == '') {
+      alert("please select item");
+      return false;
+
+   }
+   
+    obj.cart_no =checkRow;
+    	   obj.cart_qty= quantityAmount.value;
+    	   obj.cart_price=priceAmount.value;
+   arr.push(obj);
+    	   	   alert(arr);
+    
+   alert(arr[0]+","+cart_no[0]+","+cart_no[1]+"@@@");
+   console.log("### checkRow => {}" + checkRow);
+   if (confirm("Do you want to delete?"+checkRow)) {
+       
+            $.ajax({
+    	            url : 'cart_update_action',
+    	               type : 'POST',
+    	               dataType : 'json',
+    	          data:JSON.stringify(arr),
+    	          contentType:"application/json",
+    	               success : function(data) {
+    	                  alert("success");
+    	               }
+    	            })
+
+         
+
+   }
+
+   
+}
+    /*
+	 * function updateValue(priceAmount,quantityAmount){
+	 * 
+	 * alert(priceAmount.value); var checkRow = ""; var arr= new Array(); var
+	 * obj=new Object();
+	 * 
+	 * 
+	 * 
+	 *  }
+	 * 
+	 * $("[name='checkOne']:checked").each(function() { checkRow = checkRow +
+	 * $(this).val() + ","; }); checkRow = checkRow.substring(0,
+	 * checkRow.lastIndexOf(",")); if (checkRow == '') { alert("please select
+	 * item"); return false; } obj.cart_no =checkRow; obj.cart_qty=
+	 * quantityAmount.value; obj.cart_price=priceAmount.value;
+	 * 
+	 * arr.push(obj);
+	 * 
+	 * 
+	 * alert(arr);
+	 * 
+	 * 
+	 * console.log("### checkRow => {}" + checkRow); if (confirm("Do you want to
+	 * update?"+checkRow+checkRow[0])) {
+	 * 
+	 * $.ajax({ url : 'cart_update_action', type : 'POST', dataType : 'json',
+	 * data:JSON.stringify(arr), contentType:"application/json", success :
+	 * function(data) { alert("success"); } })
+	 * 
+	 * 
+	 *  }
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 */
+  
+function increaseValue(quantityAmount,priceAmount,priceAmount2,priceAmount3,totalArray) {
+    var checkRow = "";
+     $("[name='checkOne']:checked").each(function() {
+        checkRow = checkRow + $(this).val() + ",";
+     });
+     checkRow = checkRow.substring(0, checkRow.lastIndexOf(","));
+     
+     if (checkRow == '') {
+        alert("please select item");
+        return false;
+  
+     }
+     
+   // alert(quantityAmount,priceAmount);
+   // alert(quantity,price);
+   value = parseInt(quantityAmount.value, 10);
+    console.log(quantityAmount, quantityAmount.value);
+   const mulPrice=parseInt(priceAmount3.value,10);
+
+    value = isNaN(value) ? 0 : value;
+    value++;
+    
+    quantityAmount.value = value;
+
+
+    total=parseInt(mulPrice)*parseInt(quantityAmount.value, 10);
+
+ 
+ 
+priceAmount.value =total;
+
+priceAmount2.innerHTML=addComma(total);
+var increasetotalValue=parseInt($('#subtotal').text())+parseInt(priceAmount3.value,10);
+
+$('#subtotal').text(increasetotalValue);
+}
+
+    function decreaseValue(quantityAmount,priceAmount,priceAmount2,priceAmount3) {
+       // alert(quantityAmount,priceAmount);
+       // alert(quantity,price);
+       value = parseInt(quantityAmount.value, 10);
+       
+        console.log(quantityAmount, quantityAmount.value);
+       
+        const mulPrice=parseInt(priceAmount3.value,10);
+        value = isNaN(value) ? 0 : value;
+        if(value<=1){return false;}
+          if (value > 1) value--;
+      
+        
+       
+        quantityAmount.value = value;
+    
+     
+   
+      
+        total=parseInt(mulPrice)*parseInt(quantityAmount.value, 10);
+
+    
+    priceAmount.value =total;
+
+    priceAmount2.innerHTML=addComma(total);
+    var decreasetotalValue=parseInt($('#subtotal').text())-parseInt(priceAmount3.value,10);
+
+    $('#subtotal').text(decreasetotalValue);
+   
+    }
+/*
+ * function decreaseValue(quantityAmount,priceAmount,priceAmount2) { value =
+ * parseInt(quantityAmount.value, 10);
+ * alert(priceAmount+","+priceAmount2+","+quantityAmount);
+ * console.log(quantityAmount, quantityAmount.value);
+ * 
+ * value = isNaN(value) ? 0 : value; if (value > 0) value--;
+ * 
+ * quantityAmount.value = value; alert( quantityAmount.value );
+ * 
+ * 
+ * total=parseInt(priceAmount.value)*parseInt(quantityAmount.value, 10);
+ * 
+ * 
+ * 
+ * priceAmount.value =total;
+ * 
+ * priceAmount2.innerHTML=total; }
+ */
+  init();
+
+  
+
+// ------- End Quantity Increase & Decrease Value --------//

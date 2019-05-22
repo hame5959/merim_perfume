@@ -1,0 +1,230 @@
+package jenkim49.cart.controller;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.json.simple.JSONArray;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import jenkim49.cart.Cart;
+import jenkim49.cart.CartService;
+import jenkim49.product.Product;
+
+@Controller
+public class CartController {
+	private CartService cartService;
+
+	public CartController() {
+		// TODO Auto-generated constructor stub
+		System.out.println("Constructor Controller");
+	}
+	
+	@Autowired
+	public void setCartService(CartService cartService) {
+		System.out.println("cartService");
+		this.cartService = cartService;
+	}
+
+	@RequestMapping("cart")
+	public String cart_list(@RequestParam("m_id") String m_id, Map map, Model model) {
+		String forwardPath = "";
+		if (m_id == null || m_id.equals("")) {
+			forwardPath = "redirect:index";
+		} else {
+			try {
+				List<HashMap> cartList  = cartService.cart_viewById(m_id);
+				System.err.println(cartList);
+				if (cartList == null) {
+					model.addAttribute("ERROR_MSG", "존재하지않는 게시물입니다.");
+					forwardPath = "forward:index";
+				} else {
+					map.put("cartList", cartList);
+					forwardPath = "cart";
+				}
+			} catch (Exception e) {
+				forwardPath = "product_error";
+				e.printStackTrace();
+			}
+		}
+		return forwardPath;
+	}
+	
+	
+	/*
+	 * 
+	 * 	@RequestMapping(value="cart_delete_action_one", method=RequestMethod.POST)
+	public String cart_delete_action_one_post(@RequestParam("cart_no") int cart_no) {
+		String forwardPath = "";
+		try {
+			cartService.cart_deleteOne(cart_no);
+			forwardPath = "redirect:cart_list";
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			forwardPath="product_error";
+		}
+		return forwardPath;
+	}
+	 * */
+	@RequestMapping("cart_list")
+	public String cart_list1(@RequestParam("m_id") String m_id, Map map, Model model) {
+		String forwardPath = "";
+		if (m_id == null || m_id.equals("")) {
+			forwardPath = "redirect:index";
+		} else {
+			try {
+				List<HashMap> cartList  = cartService.cart_viewById(m_id);
+				System.err.println(cartList);
+				if (cartList == null) {
+					model.addAttribute("ERROR_MSG", "존재하지않는 게시물입니다.");
+					forwardPath = "forward:index";
+				} else {
+					map.put("cartList", cartList);
+					forwardPath = "cart_list";
+				}
+			} catch (Exception e) {
+				forwardPath = "product_error";
+				e.printStackTrace();
+			}
+		}
+		return forwardPath;
+	}
+	
+	
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value="cart_update_action", method=RequestMethod.POST)
+	@ResponseBody
+	public  String cart_update_action(HttpServletRequest request, @RequestBody String paramData) {
+		   String forwardPath="";
+		/*  JSONArray jsonArray = JSONArray.fromObject(paramData);*/
+		 
+	   		try {
+	   		 List<Map<String,Object>> resultMap = new ArrayList<Map<String,Object>>();
+		       resultMap = net.sf.json.JSONArray.fromObject(paramData);
+		       
+		       for (Map<String, Object> map : resultMap) {   
+		    	 	 System.out.println("dhodksskdhk"+Integer.parseInt(map.get("cart_no").toString()));
+		   		boolean updateOK;
+		   		Cart updateCart = new Cart(Integer.parseInt(map.get("cart_qty").toString()), 
+		   				Integer.parseInt(map.get("cart_price").toString()), new java.sql.Date(System.currentTimeMillis()), 
+		   				Integer.parseInt(map.get("cart_no").toString()));
+		   		
+		  
+	   			updateOK=cartService.cart_updateQty(updateCart);
+	   			if(updateOK) {
+	   				forwardPath="forward:cart";
+	   			} else {
+	   				forwardPath = "product_error";
+	   			}
+	       
+		       }
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			forwardPath = "product_error";
+		} 
+	   	   return forwardPath;
+	}
+	    
+	
+	
+
+
+
+	/*
+	@RequestMapping(value="cart_update_action", method=RequestMethod.POST)
+	public String cart_update_action(@RequestParam("cart_qty") String cart_qty,
+									 @RequestParam("cart_price") String cart_price,
+									 @RequestParam("cart_no") String cart_no){
+		String forwardPath="";
+		System.out.println("수정"+cart_qty);
+		boolean updateOK;
+		Cart updateCart = new Cart(Integer.parseInt(cart_qty), 
+				Integer.parseInt(cart_price), new java.sql.Date(System.currentTimeMillis()), 
+				Integer.parseInt(cart_no));
+		try {
+			
+			updateOK=cartService.cart_updateQty(updateCart);
+			if(updateOK) {
+				forwardPath="forward:cart";
+			} else {
+				forwardPath = "product_error";
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			forwardPath = "product_error";
+		} 
+		return forwardPath;
+	}
+	
+
+	
+	@RequestMapping(value="cart_insert_action", method=RequestMethod.POST)
+	public String cart_insert_action_post(@ModelAttribute Cart cart) {
+		String forwardPath = "";
+		try {
+			cartService.cart_insert(cart);
+			forwardPath="forward:cart";
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			forwardPath="product_error";
+		}
+		return forwardPath;
+	}
+	
+*/
+	@RequestMapping(value="cart_delete_action_all", method=RequestMethod.POST)
+	public String cart_delete_action_all_post(@RequestParam("m_id") String m_id) {
+		String forwardPath = "";
+		try {
+			cartService.cart_deleteAll(m_id);
+			forwardPath = "redirect:cart";
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			forwardPath="product_error";
+		}
+		return forwardPath;
+	}
+	
+	@RequestMapping(value="cart_delete_action_one", method=RequestMethod.GET)
+	public String cart_delete_action_one_get() {
+		String forwardPath = "redirect:cart";
+		return forwardPath;
+	}
+	
+	@RequestMapping(value="cart_delete_action_one", method=RequestMethod.POST)
+	public String cart_delete_action_one_post(@RequestParam("cart_no") int[] cart_no) {
+		String forwardPath = "";
+		try {
+			for (int i = 0; i < cart_no.length; i++) {
+				cartService.cart_deleteOne(cart_no[i]);
+			}
+			
+			forwardPath = "redirect:cart_list";
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			forwardPath="product_error";
+		}
+		return forwardPath;
+	}
+	
+	
+	
+}

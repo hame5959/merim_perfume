@@ -1,0 +1,516 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%
+
+%>
+    <!DOCTYPE html>
+    <html lang="zxx" class="no-js">
+    <head>
+     <script src="js/vendor/jquery-2.2.4.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+            <script src="js/vendor/bootstrap.min.js"></script>
+            <script src="js/jquery.ajaxchimp.min.js"></script>
+            <script src="js/jquery.nice-select.min.js"></script>
+            <script src="js/jquery.sticky.js"></script>
+            <script src="js/ion.rangeSlider.js"></script>
+            <script src="js/jquery.magnific-popup.min.js"></script>
+            <script src="js/owl.carousel.min.js"></script>            
+            <script src="js/main.js"></script>
+            <script src="js/member.js"></script>
+            <script src="js/accord.js"></script>
+            <script src="js/survey.js"></script>
+            <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.0/dist/jquery.validate.js"></script>
+           <script type="text/javascript">
+           var ajax = {};
+           ajax.xhr = {};
+           ajax.xhr.Request = function(url, params, callback, method) {
+              this.XHR=null;
+              this.url = url;
+              this.params = params;
+              this.callback = callback;
+              this.method = method;
+              this.send();
+           };
+           ajax.xhr.Request.prototype = {
+              getXMLHttpRequest : function() {
+                 if (window.XMLHttpRequest) {
+                    return new XMLHttpRequest();
+                 } else {
+                    return null;
+                 }
+              },
+              send : function() {
+                 this.XHR = this.getXMLHttpRequest();
+                 var httpMethod = this.method ? this.method : 'GET';
+                 if (httpMethod != 'GET' && httpMethod != 'POST') {
+                    httpMethod = 'GET';
+                 }
+                 var httpParams = (this.params == null || this.params == '') ? null
+                       : this.params;
+                 var httpUrl = this.url;
+                 if (httpMethod == 'GET' && httpParams != null) {
+                    httpUrl = httpUrl + "?" + httpParams;
+                 }
+                 this.XHR.open(httpMethod, httpUrl, true);
+                 this.XHR.setRequestHeader('Content-Type',
+                       'application/x-www-form-urlencoded');
+                 
+                 var request = this;
+                 
+                 this.XHR.onreadystatechange = function() {
+                    request.callback(this,'...');
+                 };
+                 
+                 //this.XHR.onreadystatechange=this.callback;
+                 
+                 this.XHR.send(httpMethod == 'POST' ? httpParams : null);
+              }
+           };
+           
+           /****************** 회원리스트 ********************/
+      function member_list() {
+	    $.ajax({
+		url : "member_list",
+		method : "POST",
+		data : {},
+		dataType : "json",
+		success : function(textData) {
+			var html = "";
+			var jsonArray = textData;
+			html += "<table class=\"table table-hover\">";
+			html +=	"<thead>";
+			html += "<th>번호</th>";
+			html += "<th>아이디</th>";
+			html +=	"<th>이름</th>";
+			html +=	"<th>연락처</th>";
+			html +=	"<th>이메일</th>";
+			html +=	"<th>주소</th>";
+			html +=	"</thead>";
+			for (var i = 0; i < jsonArray.length; i++) {
+				var memberJsonObject = jsonArray[i];
+				html += "<tr>";
+				html += "<th>" + memberJsonObject.m_no + "</td>";
+				html += "<td>" + memberJsonObject.m_id + "</td>";
+				html += "<td>" + memberJsonObject.m_name + "</td>";
+				html += "<td>" + memberJsonObject.m_contact + "</td>";
+				html += "<td>" + memberJsonObject.m_email + "</td>";
+				html += "<td>" + memberJsonObject.m_address + "</td>";
+				html += "</tr>";
+			}
+				html += "</table>";
+				$('#list').html(html);
+		}
+	});
+}
+/************** 주문리스트 ******************/
+      function jumun_list() {
+	    $.ajax({
+		url : "jumun_all_list_admin",
+		method : "POST",
+		data : {},
+		dataType : "json",
+		success : function(textData) {
+			var html = "";
+			var jsonArray = textData;
+			html += "<table class=\"table table-hover\">";
+			html +=	"<thead>";
+			html += "<th>번호</th>";
+			html += "<th>주문명</th>";
+			html +=	"<th>전체수량</th>";
+			html +=	"<th>전체금액</th>";
+			html +=	"<th>주문날짜</th>";
+			html +=	"<th>회원아이디</th>";
+			html +=	"</thead>";
+			for (var i = 0; i < jsonArray.length; i++) {
+				var jumunJsonObject = jsonArray[i];
+				html += "<tr>";
+				html += "<th>" + jumunJsonObject.j_no + "</td>";
+				html += "<td><a class='jumunDetail' data-name='"+jumunJsonObject.j_no+"' href='jd_list_jno?j_no="+jumunJsonObject.j_no+"'>" + jumunJsonObject.j_name + "</a></td>";
+				html += "<td>" + jumunJsonObject.j_total_qty + "</td>";
+				html += "<td>" + jumunJsonObject.j_total_price + "</td>";
+				html += "<td>" + jumunJsonObject.j_date + "</td>";
+				html += "<td>" + jumunJsonObject.m_id + "</td>";
+				html += "</tr>";
+			}
+				html += "</table>";
+				$('#list').html(html);
+		}
+	});
+}
+
+/*
+      $(function(){
+    		$(document).on('click','.jumunDetail',function(e){
+    			if(e.target.className == 'jumunDetail'){
+    				var j_no = $(e.target).data('name');
+    				var param = "j_no="+j_no;
+    				$.ajax({
+    					url : 'jd_list_jno',
+    					method : 'POST',
+    					data: param,
+    					dataType : 'text',
+    					success: function(textData){
+    						alert(textData);
+    						
+    					}
+    				})
+    			}
+    		})
+    	});
+*/
+
+/***************** 상품 리스트 ***************/
+function product_list() {
+	    $.ajax({
+		url : "product_list_admin",
+		method : "POST",
+		data : {},
+		dataType : "json",
+		success : function(textData) {
+			var html = "";
+			var jsonArray = textData;
+			html += "<table class=\"table table-hover\">";
+			html +=	"<thead>";
+			html += "<th>분류</th>";
+			html += "<th>브랜드</th>";
+			html +=	"<th>품명</th>";
+			html +=	"<th>용량</th>";
+			html +=	"<th>가격</th>";
+			html +=	"<th>이미지</th>";
+			html +=	"<th>키워드</th>";
+			html +=	"<th>설명</th>";
+			html +=	"<th>판매</th>";
+			html +=	"</thead>";
+			for (var i = 0; i < jsonArray.length; i++) {
+				var productJsonObject = jsonArray[i];
+				html += "<tr>";
+				html += "<td>" + productJsonObject.p_category + "</td>";
+				html += "<td>" + productJsonObject.br_name + "</td>";
+				html += "<td>" + productJsonObject.p_name + "</td>";
+				html += "<td>" + productJsonObject.p_volume + "</td>";
+				html += "<td>" + productJsonObject.p_price + "</td>";
+				html += "<td><img src='img/product/"+productJsonObject.p_image+"' alt='No image' class='img-thumbnail'></td>";
+				html += "<td>" + productJsonObject.p_keyword + "</td>";
+				html += "<td>" + productJsonObject.p_des + "</td>";
+				html += "<td>" + productJsonObject.p_count + "</td>";
+				html += "</tr>";
+			}
+				html += "</table>";
+				$('#list').html(html);
+		}
+	});
+}
+
+      
+
+/************** 설문 리스트 ******************/
+      function survey_list() {
+	    $.ajax({
+		url : "survey_list_admin",
+		method : "POST",
+		data : {},
+		dataType : "json",
+		success : function(textData) {
+			var html = "";
+			var jsonArray = textData;
+			html += "<table class=\"table table-hover\">";
+			html +=	"<thead>";
+			html += "<th>번호</th>";
+			html += "<th>좋아하는향1</th>";
+			html +=	"<th>좋아하는향2</th>";
+			html +=	"<th>좋아하는향3</th>";
+			html +=	"<th>연령대</th>";
+			html +=	"<th>성별</th>";
+			html +=	"<th>회원아이디</th>";
+			html +=	"</thead>";
+			for (var i = 0; i < jsonArray.length; i++) {
+				var surveyJsonObject = jsonArray[i];
+				html += "<tr>";
+				html += "<th>" + surveyJsonObject.s_no + "</td>";
+				html += "<td>" + surveyJsonObject.s_fav1 + "</td>";
+				html += "<td>" + surveyJsonObject.s_fav2 + "</td>";
+				html += "<td>" + surveyJsonObject.s_fav3 + "</td>";
+				html += "<td>" + surveyJsonObject.s_age + "</td>";
+				html += "<td>" + surveyJsonObject.s_gender + "</td>";
+				html += "<td>" + surveyJsonObject.m_id + "</td>";
+				html += "</tr>";
+			}
+				html += "</table>";
+				$('#list').html(html);
+		}
+	});
+}
+
+/************** 향 리스트 ******************/
+      function accord_list() {
+	    $.ajax({
+		url : "accord_list_admin",
+		method : "POST",
+		data : {},
+		dataType : "json",
+		success : function(textData) {
+			var html = "";
+			var jsonArray = textData;
+			html += "<table class=\"table table-hover\">";
+			html +=	"<thead>";
+			html += "<th>이름</th>";
+			html += "<th>설명</th>";
+			html +=	"<th>이미지</th>";
+			html +=	"<th>삭제</th>";
+			html +=	"</thead>";
+			for (var i = 0; i < jsonArray.length; i++) {
+				var accordJsonObject = jsonArray[i];
+				html += "<tr>";
+				html += "<th>" + accordJsonObject.acd_name + "</td>";
+				html += "<td>" + accordJsonObject.acd_des + "</td>";
+				html += "<td><img src='img/survey/"+accordJsonObject.acd_img+"' alt='No image' class='img-thumbnail'></td>";
+				html += "<td><input class='view-btn color-2 mt-20 w-20 deleteB' type='button' data-name='"+accordJsonObject.acd_name+"' value='삭제'></td>";
+				html += "</tr>";
+			}
+				html += "</table>";
+				html += "<div class='button-group' align='right'>";
+				html += "<button class='view-btn color-2 mt-20 w-40 addB'><span>향 추가</span></button>";
+				html += "</div>";
+				$('#list').html(html);
+		}
+	});
+}
+
+
+
+
+$(function(){
+	$(document).on('click','.addB',function(e){
+		accord_insert_form();
+	})
+});
+
+
+$(function(){
+	$(document).on('click','.deleteB',function(e){
+		if(!confirm("이 향을 삭제하시겠습니까?")){
+			return;
+		}
+		var acd_name = $(e.target).data('name');
+		var param = "acd_name="+acd_name;
+		alert(param);
+		$.ajax({
+			url : 'accord_delete_action',
+			method : 'POST',
+			data: param,
+			dataType : 'text',
+			success: function(textData){
+				if(textData=='OK'){
+					alert('삭제되었습니다.');
+					window.location = 'admin';
+				} else if(textData=='Fail'){
+					alert('삭제 실패하였습니다.');
+				}
+			}
+		})
+	})
+	
+});
+
+
+      
+           </script>
+    
+        <!-- Mobile Specific Meta -->
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <!-- Favicon-->
+        <link rel="shortcut icon" href="img/fav.png">
+        <!-- Author Meta -->
+        <meta name="author" content="CodePixar">
+        <!-- Meta Description -->
+        <meta name="description" content="">
+        <!-- Meta Keyword -->
+        <meta name="keywords" content="">
+        <!-- meta character set -->
+        <meta charset="UTF-8">
+        <!-- Site Title -->
+        <title>Shop</title>
+
+        <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,400,300,500,600,700" rel="stylesheet"> 
+            <!--
+            CSS
+            ============================================= -->
+            <link rel="stylesheet" href="css/linearicons.css">
+            <link rel="stylesheet" href="css/owl.carousel.css">            
+            <link rel="stylesheet" href="css/font-awesome.min.css">
+            <link rel="stylesheet" href="css/nice-select.css">
+            <link rel="stylesheet" href="css/ion.rangeSlider.css" />
+            <link rel="stylesheet" href="css/ion.rangeSlider.skinFlat.css" />
+            <link rel="stylesheet" href="css/bootstrap.css">
+            <link rel="stylesheet" href="css/main.css">
+        </head>
+        <body>
+        
+
+            <!-- Start Header Area -->
+            <jsp:include page="header.jsp"/>
+            <!-- End Header Area -->
+
+            <!-- Start Banner Area -->
+            <jsp:include page="banner.jsp"/>
+            <!-- End Banner Area -->
+
+		<!-- Start Admin Button -->
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="admin-menu">
+						<h3 class="billing-title text-center">Admin Page</h3>
+						<p class="text-center mt-80 mb-40">  </p>
+						<form name="f" method="post">
+						
+						<button type="button" class="view-btn color-2 mt-20 w-20" onclick="member_list()"><span>회원관리</span></button>
+						<button type="button" class="view-btn color-2 mt-20 w-20" onclick="jumun_list()"><span>주문관리</span></button>
+						<button type="button" class="view-btn color-2 mt-20 w-20" onclick="product_list()"><span>상품관리</span></button>
+						<button type="button" class="view-btn color-2 mt-20 w-20" onclick="survey_list()"><span>설문관리</span></button>
+						<button type="button" class="view-btn color-2 mt-20 w-20" onclick="accord_list()"><span>향 관리</span></button>
+						
+						<input type="hidden" id="accordDelete">
+						
+						
+						</form>
+					</div>
+				</div>
+			</div>
+			<div id="list">
+			
+			</div>
+		</div>
+		<!-- End Admin Button -->
+		
+		
+		
+
+            <!-- Start Most Search Product Area -->
+            <section class="section-half">
+                <div class="container">
+                    <div class="organic-section-title text-center">
+                        <h3>Most Searched Products</h3>
+                    </div>
+                    <div class="row mt-30">
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r1.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore fresh Blueberry</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $240.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r2.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore fresh Cabbage</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $189.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r3.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore fresh Raspberry</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $189.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r4.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore fresh Kiwi</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $189.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r5.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore Bell Pepper</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $120.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r6.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore fresh Blackberry</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $120.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r7.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore fresh Brocoli</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $120.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r8.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore fresh Carrot</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $120.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r9.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore fresh Strawberry</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $240.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r10.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Prixma MG2 Light Inkjet</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $240.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r11.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore fresh Cherry</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $240.00 <del>$340.00</del></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r12.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore fresh Beans</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $240.00 <del>$340.00</del></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- End Most Search Product Area -->
+
+            <!-- start footer Area -->      
+            <jsp:include page="footer.jsp"/>
+            <!-- End footer Area -->        
+
+           
+        </body>
+    </html>

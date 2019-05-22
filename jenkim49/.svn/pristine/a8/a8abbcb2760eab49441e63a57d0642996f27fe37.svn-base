@@ -1,0 +1,191 @@
+package jenkim49.jumun.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import jenkim49.checkout.Checkout;
+import jenkim49.jumun.Jumun;
+import jenkim49.jumun.JumunService;
+import jenkim49.jumundetail.JumunDetail;
+import jenkim49.jumundetail.JumunDetailService;
+
+@Controller
+public class JumunController {
+
+	private JumunService jumunservice;
+	private JumunDetailService jumunDetailService;
+
+	public JumunController() {
+		System.out.println("########################JumunController");
+	}
+
+	public JumunController(JumunService jumunservice) {
+		super();
+	}
+
+	@Autowired
+	public void setJumunservice(JumunService jumunservice) {
+		this.jumunservice = jumunservice;
+	}
+	
+	@Autowired
+	public void setJumunDetailService(JumunDetailService jumunDetailService) {
+		this.jumunDetailService = jumunDetailService;
+	}
+
+	@RequestMapping("jumun_all_list")
+	public String jumun_list(Model model) {
+		String forwardPath = "";
+		try {
+			java.util.List<Jumun> jumunList = jumunservice.jumun_readAll();
+			model.addAttribute("jumunList", jumunList);
+			forwardPath = "jumun_all_list";
+		} catch (Exception e) {
+			e.printStackTrace();
+			forwardPath = "jumun_error";
+		}
+		return forwardPath;
+	}
+	
+	@RequestMapping("jumun_all_list_admin")
+	public @ResponseBody List<Jumun> jumun_all_list_admin(Model model) {
+		List<Jumun> jumunList = new ArrayList<Jumun>();
+		try {
+			jumunList = jumunservice.jumun_readAll();
+			model.addAttribute("jumunList", jumunList);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return jumunList;
+	}
+	
+	
+
+	@RequestMapping("jumun_list_member")
+	public @ResponseBody List<Jumun> jumun_list_member(HttpSession session, Model model) {
+		List<Jumun> jumunList = null;
+			try {
+				System.err.println(session.getAttribute("sMemberId"));
+				jumunList = jumunservice.jumun_readId((String)session.getAttribute("sMemberId"));
+				if (jumunList == null) {
+					model.addAttribute("MSG", "주문내역이 없습니다!!!");
+				} else {
+					model.addAttribute("jumun", jumunList);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		
+		return jumunList;
+	}
+	@RequestMapping("jumun_list")
+	public String jumun_view(@RequestParam("m_id") String m_id, Model model) {
+		String forwardPath = "";
+		if (m_id == null || m_id.equals("")) {
+			forwardPath = "redirect:jumun_list";
+		} else {
+			List<Jumun> jumun = null;
+			try {
+				jumun = jumunservice.jumun_readId(m_id);
+				if (jumun == null) {
+					model.addAttribute("ERROR_MSG", "존재하지않는 게시물입니다.");
+					forwardPath = "forward:jumun_list";
+				} else {
+					model.addAttribute("jumun", jumun);
+					forwardPath = "jumun_view";
+				}
+
+			} catch (Exception e) {
+				forwardPath = "jumun_error";
+				e.printStackTrace();
+
+			}
+		}
+		return forwardPath;
+	}
+
+	@RequestMapping("jumun_write_form")
+	public String jumun_write_form() {
+		String forwardPath = "jumun_write_form";
+		return forwardPath;
+	}
+
+	public String jumun_write_action_get() {
+		String forward_path = "redirect:jumun_list";
+		return forward_path;
+	}
+
+	@RequestMapping("jumun_write_action")
+	public String jumun_write_action_post(@ModelAttribute Jumun jumun) {
+		System.out.println(jumun);
+		String forwardPath = "";
+		boolean insertOK = false;
+		try {
+
+			insertOK = jumunservice.jumun_insert(jumun);
+			if (insertOK) {
+				forwardPath = "redirect:jumun_list";
+			} else {
+				forwardPath = "jumun_error";
+			}
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			forwardPath = "jumun_error";
+
+		}
+		return forwardPath;
+	}
+	
+	// Insert Jumun when a customer click 'checkout' button in product single view page [GET]
+	@RequestMapping(value="jumun_insert_action_directly", method=RequestMethod.GET)
+	public String jumun_insert_action_directly_get() {
+		String forwardPath = "redirect:1product_view1";
+		return forwardPath;
+	}
+	
+	// Insert Jumun when a customer click 'checkout' button in product single view page [POST]
+	@RequestMapping(value="jumun_insert_action_directly", method=RequestMethod.POST)
+	public String jumun_insert_action_directly_post(@ModelAttribute Jumun jumun, JumunDetail jumunDetail,
+													Model model, HttpSession session) {
+		System.err.println(jumun);
+		System.err.println(jumunDetail);
+
+		JumunDetail jumunDetail2 = new JumunDetail(-999, jumun.j_total_qty, jumun.j_total_price, jumun.j_no, jumunDetail.getP_no());
+		ArrayList<JumunDetail> jdList = new ArrayList<JumunDetail>();
+		jdList.add(jumunDetail2);
+		Jumun jumun1 = new Jumun(jumun.getJ_no(), jumun.getJ_name(), jumun.getJ_total_qty(), jumun.getJ_total_price(), 
+				new java.sql.Date(System.currentTimeMillis()), jumun.getM_id(), jdList);
+		
+		String forwardPath = "";
+		
+		try {
+			Jumun jumun2 = jumunservice.jumun_insert_directly(jumun1);
+			System.err.println("1)"+jumun2);
+			session.setAttribute("j_no", jumun2.j_no);
+			if(jumun2!=null) {
+				forwardPath = "forward:1checkout";
+				System.out.println("2)"+forwardPath);
+			} else {
+				forwardPath = "product_error";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			forwardPath = "product_error";
+		}
+		return forwardPath;
+	}
+
+}

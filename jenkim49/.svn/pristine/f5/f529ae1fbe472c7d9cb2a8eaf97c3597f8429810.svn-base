@@ -1,0 +1,42 @@
+package jenkim49.jumun;
+
+import java.util.List;
+
+public class JumunServiceImpl implements JumunService {
+	
+	public JumunDao jumunDao = new JumunDaoImpl();
+	
+	public JumunServiceImpl() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	public void setJumunDao(JumunDao jumunDao) {
+		this.jumunDao = jumunDao;
+	}
+
+	// INSERT INTO JUMUN VALUES(JUMUN_no_seq.nextval,?,?,?,SYSDATE,?)
+	@Override
+	public boolean jumun_insert(Jumun jumun) throws Exception {
+		return jumunDao.jumun_insert(jumun);
+	}
+
+	// SELECT * FROM JUMUN WHERE m_id = ?
+	@Override
+	public List<Jumun> jumun_readId(String m_id) throws Exception {
+		return jumunDao.jumun_readId(m_id);
+	}
+
+	// SELECT * FROM JUMUN
+	@Override
+	public List<Jumun> jumun_readAll() throws Exception {
+		return jumunDao.jumun_readAll();
+	}
+	
+	// SELECT * FROM JUMUN WHERE j_no = ?
+	@Override
+	public Jumun jumun_readNo(int j_no) throws Exception {
+		return jumunDao.jumun_readNo(j_no);
+	}
+
+
+}

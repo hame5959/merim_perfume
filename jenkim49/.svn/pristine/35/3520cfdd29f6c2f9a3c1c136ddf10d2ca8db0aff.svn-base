@@ -1,0 +1,377 @@
+<%@page import="java.util.HashMap"%>
+<%@page import="org.apache.jasper.tagplugins.jstl.core.ForEach"%>
+<%@page import="jenkim49.cart.Cart"%>
+<%@page import="java.util.ArrayList"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%
+   ArrayList<HashMap> cartList=(ArrayList<HashMap>)request.getAttribute("cartList");
+   String ERROR_MSG=(String)request.getAttribute("ERROR_MSG");
+%>
+
+    <!DOCTYPE html>
+    <html lang="zxx" class="no-js">
+    <head>
+        <!-- Mobile Specific Meta -->
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <!-- Favicon-->
+        <link rel="shortcut icon" href="img/fav.png">
+        <!-- Author Meta -->
+        <meta name="author" content="CodePixar">
+        <!-- Meta Description -->
+        <meta name="description" content="">
+        <!-- Meta Keyword -->
+        <meta name="keywords" content="">
+        <!-- meta character set -->
+        <meta charset="UTF-8">
+        <!-- Site Title -->
+        <title>Shop</title>
+        <script type="text/javascript">
+      <%
+      if(ERROR_MSG!=null){
+         out.println("alert('"+ERROR_MSG+"')");   
+      }
+   
+      %>
+    
+      
+    
+   
+      </script>
+     
+
+        <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,400,300,500,600,700" rel="stylesheet"> 
+            <!--
+            CSS
+            ============================================= -->
+            <link rel="stylesheet" href="css/linearicons.css">
+            <link rel="stylesheet" href="css/owl.carousel.css">            
+            <link rel="stylesheet" href="css/font-awesome.min.css">
+            <link rel="stylesheet" href="css/nice-select.css">
+            <link rel="stylesheet" href="css/ion.rangeSlider.css" />
+            <link rel="stylesheet" href="css/ion.rangeSlider.skinFlat.css" />
+            <link rel="stylesheet" href="css/bootstrap.css">
+            <link rel="stylesheet" href="css/main.css">
+        </head>
+        <body>
+
+            	<!-- include_common_top.jsp start-->
+	<jsp:include page="1include_common_header.jsp" />
+	<!-- include_common_top.jsp end-->
+            <!-- Start Banner Area -->
+            <section class="banner-area organic-breadcrumb">
+                <div class="container">
+                    <div class="breadcrumb-banner d-flex flex-wrap align-items-center">
+                        <div class="col-first">
+                            <h1>Shopping Cart</h1>
+                             <nav class="d-flex align-items-center justify-content-start">
+                                <a href="index.html">Home<i class="fa fa-caret-right" aria-hidden="true"></i></a>
+                                <a href="cart.html">Shopping Cart</a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- End Banner Area -->
+
+            <!-- Start Cart Area -->
+           
+            <div class="container">
+                <div class="cart-title">
+                    <div class="row">
+                       <div class="col-md-1">
+                          <input type="checkbox"   name="checkAll">
+                       </div>
+                        <div class="col-md-4">
+                            <h6 class="ml-15">Product</h6>
+                        </div>
+                        <div class="col-md-2">
+                            <h6>Volume</h6>
+                        </div>
+                        <div class="col-md-2">
+                            <h6>Price</h6>
+                        </div>
+                        <div class="col-md-2">
+                            <h6>Quantity</h6>
+                        </div>
+                        <div class="col-md-2">
+                            <h6>Total</h6>
+                        </div>
+                    </div>
+                </div>
+           <!-- loop start -->
+            <form name="sm1" method="post">
+            <%for(HashMap cart:cartList){%>
+               <input type="hidden" name = "m_id"  value="jenkim49">
+                <div class="cart-single-item">
+                    <div class="row align-items-center">
+                        <div class="col-md-2 col-2">
+                            <div class="cart-checkbox">
+                            <input type="hidden" id = "p_no" name="p_no" value=<%=cart.get("p_no")%>>
+                        <input type="hidden" id = "cart_no" name="cart_no" value=<%=cart.get("cart_no")%>>
+                               <input type="checkbox" id="checkOne" name="checkOne" value=<%=cart.get("cart_no")%>>
+                               
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div class="product-item d-flex align-items-center">
+                                <img src="/jenkim49/src/main/webapp/WEB-INF/view/image/<%=cart.get("p_image") %>" class="img-fluid" alt="">
+                                <h6 id="p_name"><%=cart.get("p_name")%></h6>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-2">
+                            <div class="volume"><%=cart.get("p_volume")%></div>
+                        </div>
+                        <div class="col-md-2 col-2">
+                            <div class="price">
+                            <div class="priceppp"><%=cart.get("cart_price")%></div> <input type="hidden" name="checkppp" class="pricepp"  id="cart_price"    value="<%=cart.get("cart_price") %>" />
+                       <input type="hidden"  class="pricepppp"  value="<%=cart.get("p_price") %>" />
+                        </div>
+                        </div>
+                        <div class="col-md-2 col-4">
+                            <div class="quantity-container d-flex align-items-center mt-15">
+                               
+                                <input type="text"  name="cart_qty" class="quantity-amount" value="<%=cart.get("cart_qty") %>" />
+                                 <input type ="hidden" id="total_qty"  name="total_qty"  value="<%=cart.get("cart_qty") %>" />
+                               
+                                <div class="arrow-btn d-inline-flex flex-column">
+                                    <button class="increase arrow" type="button" title="Increase Quantity"><span class="lnr lnr-chevron-up"></span></button>
+                                    <button class="decrease arrow" type="button" title="Decrease Quantity"><span class="lnr lnr-chevron-down"></span></button>
+                                </div>
+                                   <button class="update arrow" type="button" title="update Quantity" >변경</button>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-2 col-2">
+                            <div class="total"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                   <% } %>
+               
+           
+                <div class="subtotal-area d-flex align-items-center justify-content-end">
+                    <div class="title text-uppercase">Total</div>
+                    <div class="subtotal" id="subtotal"> </div>
+                </div>
+                <br>
+              
+                <div class="button-area d-flex align-items-center justify-content-between flex-wrap">
+                    <input type="button" class="view-btn color-2" value="DELETE" onClick="deleteDirect();"> &nbsp; 
+               <input type="button" class="view-btn color-2" value="Checkout" onClick="checkoutInsertDirect();">
+
+                </div>
+                </form>
+            </div>
+            
+            <!-- End Cart Area -->
+
+            <!-- Start Most Search Product Area -->
+            <section class="section-half">
+                <div class="container">
+                    <div class="organic-section-title text-center">
+                        <h3>Most Searched Products</h3>
+                    </div>
+                    <div class="row mt-30">
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r1.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore fresh Blueberry</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $240.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r2.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore fresh Cabbage</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $189.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r3.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore fresh Raspberry</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $189.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r4.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore fresh Kiwi</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $189.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r5.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore Bell Pepper</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $120.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r6.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore fresh Blackberry</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $120.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r7.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore fresh Brocoli</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $120.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r8.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore fresh Carrot</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $120.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r9.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore fresh Strawberry</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $240.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r10.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Prixma MG2 Light Inkjet</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $240.00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r11.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore fresh Cherry</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $240.00 <del>$340.00</del></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="single-search-product d-flex">
+                                <a href="#"><img src="img/r12.jpg" alt=""></a>
+                                <div class="desc">
+                                    <a href="#" class="title">Pixelstore fresh Beans</a>
+                                    <div class="price"><span class="lnr lnr-tag"></span> $240.00 <del>$340.00</del></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- End Most Search Product Area -->
+
+            <!-- start footer Area -->      
+            <footer class="footer-area section-gap">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-3  col-md-6 col-sm-6">
+                            <div class="single-footer-widget">
+                                <h6>About Us</h6>
+                                <p>
+                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore dolore magna aliqua.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-lg-3  col-md-6 col-sm-6">
+                            <div class="single-footer-widget">
+                                <h6>Newsletter</h6>
+                                <p>Stay update with our latest</p>
+                                <div class="" id="mc_embed_signup">
+
+                                        <form target="_blank" novalidate="true" action="https://spondonit.us12.list-manage.com/subscribe/post?u=1462626880ade1ac87bd9c93a&amp;id=92a4423d01" method="get" class="form-inline">
+
+                                        <div class="d-flex flex-row">
+
+                                            <input class="form-control" name="EMAIL" placeholder="Enter Email" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Enter Email '" required="" type="email">
+
+
+                                                <button class="click-btn btn btn-default"><i class="fa fa-long-arrow-right" aria-hidden="true"></i></button>
+                                                <div style="position: absolute; left: -5000px;">
+                                                    <input name="b_36c4fd991d266f23781ded980_aefe40901a" tabindex="-1" value="" type="text">
+                                                </div>
+                                            
+                                            <!-- <div class="col-lg-4 col-md-4">
+                                                <button class="bb-btn btn"><span class="lnr lnr-arrow-right"></span></button>
+                                            </div>  -->
+                                        </div>      
+                                        <div class="info"></div>
+                                        </form>
+                                </div>
+                                </div>
+                        </div>                      
+                        <div class="col-lg-3  col-md-6 col-sm-6">
+                            <div class="single-footer-widget mail-chimp">
+                                <h6 class="mb-20">Instragram Feed</h6>
+                                <ul class="instafeed d-flex flex-wrap">
+                                    <li><img src="img/i1.jpg" alt=""></li>
+                                    <li><img src="img/i2.jpg" alt=""></li>
+                                    <li><img src="img/i3.jpg" alt=""></li>
+                                    <li><img src="img/i4.jpg" alt=""></li>
+                                    <li><img src="img/i5.jpg" alt=""></li>
+                                    <li><img src="img/i6.jpg" alt=""></li>
+                                    <li><img src="img/i7.jpg" alt=""></li>
+                                    <li><img src="img/i8.jpg" alt=""></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-6">
+                            <div class="single-footer-widget">
+                                <h6>Follow Us</h6>
+                                <p>Let us be social</p>
+                                <div class="footer-social d-flex align-items-center">
+                                    <a href="#"><i class="fa fa-facebook"></i></a>
+                                    <a href="#"><i class="fa fa-twitter"></i></a>
+                                    <a href="#"><i class="fa fa-dribbble"></i></a>
+                                    <a href="#"><i class="fa fa-behance"></i></a>
+                                </div>
+                            </div>
+                        </div>                          
+                    </div>
+                    <div class="footer-bottom d-flex justify-content-center align-items-center flex-wrap">
+                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                        <p class="footer-text m-0">Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a></p>
+                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                    </div>
+                </div>
+            </footer>   
+            <!-- End footer Area -->        
+
+            <script src="js/vendor/jquery-2.2.4.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+            <script src="js/vendor/bootstrap.min.js"></script>
+            <script src="js/jquery.ajaxchimp.min.js"></script>
+            <script src="js/jquery.nice-select.min.js"></script>
+            <script src="js/jquery.sticky.js"></script>
+            <script src="js/ion.rangeSlider.js"></script>
+            <script src="js/jquery.magnific-popup.min.js"></script>
+            <script src="js/owl.carousel.min.js"></script>            
+            <script src="js/main.js"></script> 
+                 <script src="js/cart.js"></script>  
+        </body>
+    </html>

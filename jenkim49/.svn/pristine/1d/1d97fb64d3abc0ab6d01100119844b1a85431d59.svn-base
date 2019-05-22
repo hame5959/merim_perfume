@@ -1,0 +1,10 @@
+<<요청command>>
+
+/tag_list.do
+/tag_view.do
+/tag_write_form.do
+/tag_write_action.do
+/tag_modify_form.do
+/tag_modify_action.do
+/tag_delete_action.do
+/tag_error.do

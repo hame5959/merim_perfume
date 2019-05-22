@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd">
+	<import resource="datasource-config.xml" />
+	<!-- Uncomment and add your base-package here: <context:component-scan base-package="org.springframework.samples.service"/> -->
+	
+	<!-- ACCORD BEAN -->
+	<bean id="accordDao" class="jenkim49.accord.AccordDaoImpl">
+		<property name="dataSource" ref="apacheDataSource" />
+	</bean>
+	<bean id="accordService" class="jenkim49.accord.AccordServiceImpl">
+		<property name="accordDao" ref="accordDao" />
+	</bean>
+
+	<!-- PRODUCT BEAN -->
+	<bean id="productDao" class="jenkim49.product.ProductDaoImpl">
+		<property name="dataSource" ref="apacheDataSource" />
+	</bean>
+	<bean id="productService" class="jenkim49.product.ProductServiceImpl">
+		<property name="productDao" ref="productDao" />
+	</bean>
+
+	<!-- JUMUNDETAIL BEAN -->
+	<bean id="jumunDetailDao" class="jenkim49.jumundetail.JumunDetailDaoImpl">
+		<property name="dataSource" ref="apacheDataSource"/>
+	</bean>
+	<bean id="jumunDetailService" class="jenkim49.jumundetail.JumunDetailServiceImpl">
+		<property name="jumunDetailDao" ref="jumunDetailDao"/>
+	</bean>
+
+	<!-- CART BEAN -->
+	<bean id="cartDao" class="jenkim49.cart.CartDaoImpl">
+		<property name="dataSource" ref="apacheDataSource" />
+	</bean>
+	<bean id="cartService" class="jenkim49.cart.CartServiceImpl">
+		<property name="cartDao" ref="cartDao" />
+	</bean>
+	
+	<!-- JUMUN BEAN -->
+	<bean id="jumunDao" class="jenkim49.jumun.JumunDaoImpl">
+		<property name="dataSource" ref="apacheDataSource"/>
+	</bean>
+	<bean id="jumunService" class="jenkim49.jumun.JumunServiceImpl">
+		<property name="jumunDao" ref="jumunDao"/>
+	</bean>
+	
+	<!-- CHECKOUT BEAN -->
+	<bean id="checkoutDao" class="jenkim49.checkout.CheckoutDaoImpl">
+		<property name="dataSource" ref="apacheDataSource"/>
+	</bean>
+	<bean id="checkoutService" class="jenkim49.checkout.CheckoutServiceImpl">
+		<property name="checkoutDao" ref="checkoutDao"/>
+	</bean>
+
+	<!-- TAG BEAN -->
+	<bean id="tagDao" class="jenkim49.tag.TagDaoImpl">
+		<property name="dataSource" ref="apacheDataSource" />
+	</bean>
+	<bean id="tagService" class="jenkim49.tag.TagServiceImpl">
+		<property name="tagDao" ref="tagDao" />
+	</bean>
+
+	<!-- MEMBER BEAN -->
+	<bean id="memberDao" class="jenkim49.member.MemberDaoImpl">
+		<property name="dataSource" ref="apacheDataSource" />
+	</bean>
+
+	<bean id="memberService" class="jenkim49.member.MemberServiceImpl">
+		<property name="memberDao" ref="memberDao" />
+	</bean>
+
+	<!-- Chat BEAN -->
+	<bean id="chatDao" class="jenkim49.chat.ChatDaoImpl">
+		<property name="dataSource" ref="apacheDataSource" />
+	</bean>
+	<bean id="chatService" class="jenkim49.chat.ChatServiceImpl">
+		<property name="chatDao" ref="chatDao" />
+	</bean>
+	<!-- Brand BEAN -->
+	<bean id="brandDao" class="jenkim49.brand.BrandDaoImpl">
+		<property name="dataSource" ref="apacheDataSource" />
+	</bean>
+	<bean id="brandService" class="jenkim49.brand.BrandServiceImpl">
+		<property name="brandDao" ref="brandDao" />
+	</bean>
+	
+	<!-- Board BEAN 
+	<bean id="boardDao" class="jenkim49.board.BoardDaoImpl">
+		<property name="dataSource" ref="apacheDataSource" />
+	</bean>
+	
+	<bean id="boardService" class="jenkim49.board.BoardServiceImpl">
+		<property name="boardDao" ref="boardDao" />
+	</bean>
+	-->
+	
+	<!-- SURVEY BEAN -->
+	<bean id="surveyDao" class="jenkim49.survey.SurveyDaoImpl">
+		<property name="dataSource" ref="apacheDataSource"/>
+	</bean>
+	<bean id="surveyService" class="jenkim49.survey.SurveyServiceImpl">
+		<property name="surveyDao" ref="surveyDao"/>
+	</bean>
+	
+	<!-- Qna BEAN -->
+	<bean id="qnaDao" class="jenkim49.qna.QnaDaoImpl">
+		<property name="dataSource" ref="apacheDataSource" />
+	</bean>
+	
+	<bean id="qnaService" class="jenkim49.qna.QnaServiceImpl">
+		<property name="qnaDao" ref="qnaDao" />
+	</bean>
+	
+	<!-- Review BEAN -->
+	<bean id="reviewDao" class="jenkim49.review.ReviewDaoImpl">
+		<property name="dataSource" ref="apacheDataSource" />
+	</bean>
+	
+	<bean id="reviewService" class="jenkim49.review.ReviewServiceImpl">
+		<property name="reviewDao" ref="reviewDao" />
+	</bean> 
+	
+	<!-- transaction manager -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="apacheDataSource" />
+	</bean>
+	<!-- transaction advice -->
+	<bean id="transactionAdvice"
+		class="jenkim49.tag.TransactionAdvice">
+		<property name="manager" ref="transactionManager" />
+	</bean>
+
+	<aop:config>
+		<aop:aspect ref="transactionAdvice">
+			<aop:around method="doActionWithTransaction"
+				pointcut="execution(* jenkim49.tag.*Service.*(..))" />
+		</aop:aspect>
+	</aop:config>
+</beans>

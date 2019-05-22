@@ -1,0 +1,21 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%
+	String sMemberId = (String) session.getAttribute("sMemberId");
+	if(sMemberId==null){
+		response.sendRedirect("1index");
+	}
+	String loginButton = "login";
+	String loginHref = "login";
+	String rightButton = "register";
+	if (sMemberId != null) {
+		loginButton = "logout";
+		loginHref = "member_logout_action";
+		if (sMemberId.equals("admin")) {
+			rightButton = "admin";
+		} else {
+			rightButton = "mypage";
+		}
+
+	}
+%>

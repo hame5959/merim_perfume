@@ -1,0 +1,7 @@
+<<요청command>>
+/jd_list_all
+/jd_list_id
+/jd_insert_action
+/jd_update_form
+/jd_update_action
+/jd_delete_action

@@ -1,0 +1,45 @@
+package jenkim49.product;
+
+import java.util.List;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import jenkim49.survey.Survey;
+
+public class ProductDaoImplMain {
+
+	public static void main(String[] args) throws Exception {
+	//	System.out.println("----------Spring Container 초기화시작-----------");
+	//	ApplicationContext applicationContext=new ClassPathXmlApplicationContext("classpath:spring/application-config.xml");
+	//	System.out.println("----------Spring Container 초기화끝-----------");
+		ProductDao productDao=(ProductDao)applicationContext.getBean("productDao");
+		//System.err.println(productDao.product_readAllMain());
+		//System.err.println(productDao.product_readAllPopular());
+		//System.err.println(productDao.product_readAllCategory());
+		//System.err.println(productDao.product_readFemaleCategory());
+		//System.err.println(productDao.product_readMaleCategory());
+		//System.out.println(productDao.product_recommend("플로럴"));
+	
+		productDao.product_delete(311);
+		//System.err.println(productDao.product_survey_match("jenkim49", "F", "SWEET", "FLORAL", "FRESH", "20대전반"));
+	//	System.out.println("================================================");
+		//System.out.println(productDao.product_readOne(1));
+		//System.out.println(productDao.product_search("롬브"));
+		//System.out.println(productDao.product_survey_match("thddbsk1", "RO", "SW", "CITRUS", "10"));
+		//productDao.product_update(new Product(2, "p_category", "br_name", "p_name", "1 ",2.0f, "p_image", "p_keyword", "p_des", 0.0f, "t_name"));
+		//System.out.println(productDao.product_readAllAdmin());
+		//Product product= new Product(-999,"cte", "br", "p_name2","volume",0.0f, "p_image", "ll", "des", 0.0f, "dd");
+		//boolean ddd=productDao.product_insert(product);	
+		//System.out.println(ddd);
+		//int count = productDao.getProductCount();
+		//System.err.println(count);
+		//System.out.println(productDao.product_readAllCategory(12, 1));
+		//System.out.println(productDao.product_readFemaleCategory(12, 1));
+		//System.out.println(productDao.product_readMaleCategory(10, 1));
+		//System.out.println(productDao.product_update((float) 13.0, 243));
+	
+
+	}
+
+}

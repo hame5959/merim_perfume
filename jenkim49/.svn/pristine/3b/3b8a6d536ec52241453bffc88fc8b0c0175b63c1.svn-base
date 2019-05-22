@@ -1,0 +1,28 @@
+package jenkim49.survey;
+
+import java.util.List;
+
+public interface SurveyService {
+	/*
+	 * C
+	 */
+	boolean survey_insert(Survey survey) throws Exception;
+
+	/*
+	 * R
+	 */
+	Survey survey_readOneById(String m_id) throws Exception;
+
+	List<Survey> survey_readAll() throws Exception;
+
+	/*
+	 * U
+	 */
+	boolean survey_update(Survey updateSurvey) throws Exception;
+
+	/*
+	 * D
+	 */
+	boolean survey_remove(int s_no) throws Exception;
+
+}

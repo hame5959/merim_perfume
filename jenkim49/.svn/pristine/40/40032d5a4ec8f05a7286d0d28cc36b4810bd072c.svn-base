@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- Uncomment and your base-package here: <context:component-scan base-package="org.springframework.samples.web"/> -->
+
+	<context:annotation-config />
+	<context:component-scan
+		base-package="jenkim49.accord.controller" />
+	<context:component-scan
+		base-package="jenkim49.tag.controller" />
+	<context:component-scan
+		base-package="jenkim49.cart.controller" />
+	<context:component-scan
+		base-package="jenkim49.jumun.controller" />
+	<context:component-scan
+		base-package="jenkim49.jumundetail.controller" />
+	<context:component-scan
+		base-package="jenkim49.checkout.controller" />
+	<context:component-scan
+		base-package="jenkim49.product.controller" />
+	<context:component-scan
+		base-package="jenkim49.brand.controller" />
+	<context:component-scan
+		base-package="jenkim49.survey.controller" />
+	<context:component-scan
+		base-package="jenkim49.qna.controller" />
+	<context:component-scan
+		base-package="jenkim49.review.controller" />
+	<context:component-scan
+		base-package="jenkim49.chat.controller" />
+	<context:component-scan
+		base-package="jenkim49.member.controller" />
+	<context:component-scan
+		base-package="jenkim49.total" />
+	<mvc:annotation-driven />
+
+	<!-- static resource -->
+	<mvc:resources location="/WEB-INF/view/css/"
+		mapping="/css/**" cache-period="60" />
+	<mvc:resources location="/WEB-INF/view/fonts/"
+		mapping="/fonts/**" cache-period="60" />
+	<mvc:resources location="/WEB-INF/view/img/"
+		mapping="/img/**" cache-period="60" />
+	<mvc:resources location="/WEB-INF/view/js/"
+		mapping="/js/**" cache-period="60" />
+	<mvc:resources location="/WEB-INF/view/scss/"
+		mapping="/scss/**" cache-period="60" />
+	<mvc:resources location="/WEB-INF/view/css/"
+		mapping="/css/**" cache-period="60" />
+	<mvc:resources location="/WEB-INF/view/shop-doc/"
+		mapping="/shop-doc/**" cache-period="60" />
+
+
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<!-- Example: a logical view name of 'showMessage' is mapped to '/WEB-INF/jsp/showMessage.jsp' -->
+		<property name="prefix" value="/WEB-INF/view/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+</beans>

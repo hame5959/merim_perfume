@@ -1,0 +1,5 @@
+<<요청command>>
+/jumun_write_form
+/jumun_write_action
+/jumun_view
+/jumun_list

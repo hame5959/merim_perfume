@@ -1,0 +1,32 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<div class="pagination">
+		<a href="javascript:goPage(${param.firstPageNo })" class="prev-arrow">
+			<i class="fa fa-long-arrow-left" aria-hidden="true"></i>
+		</a> 
+		<span> <c:forEach var="i" begin="${param.startPageNo}"
+				end="${param.endPageNo}" step="1">
+				<c:choose>
+					<c:when test="${1 eq param.pageNo}">
+						<a href="javascript:goPage(${i})" class="choice">${1}</a>
+					</c:when>
+					<c:otherwise>
+						<a href="javascript:goPage(${i})">${i}</a>
+					</c:otherwise>
+				</c:choose>
+			   </c:forEach>
+		</span> 
+			<a href="javascript:goPage(${param.nextPageNo})" class="next-arrow">
+			<i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+		</a>
+	</div>
+</body>
+</html>

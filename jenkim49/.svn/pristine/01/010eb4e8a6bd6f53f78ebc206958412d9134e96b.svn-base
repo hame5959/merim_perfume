@@ -1,0 +1,11 @@
+/product_list.do
+/product_view.do
+/product_write_form.do
+/product_write_action.do
+/product_modify_form.do
+/product_modify_action.do
+/product_delete_action.do
+/product_error.do
+/product_search.do
+/product_surveymatch.do
+/product_recommend.do

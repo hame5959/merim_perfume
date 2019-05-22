@@ -1,0 +1,265 @@
+package jenkim49.jumun;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.apache.tomcat.jdbc.pool.DataSource;
+
+import jenkim49.jumundetail.JumunDetail;
+import jenkim49.jumundetail.JumunDetailSQL;
+import jenkim49.member.Member;
+import jenkim49.member.MemberSQL;
+
+public class JumunDaoImpl implements JumunDao {
+	
+	DataSource dataSource;
+	
+	public JumunDaoImpl() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+	
+	// INSERT INTO JUMUN VALUES(JUMUN_no_seq.nextval,?,?,?,SYSDATE,?)
+	@Override
+	public boolean jumun_insert(Jumun jumun) throws Exception {
+		boolean isSuccess = false;
+		Connection con = null;
+		PreparedStatement pst = null;
+		
+		try {
+			con = dataSource.getConnection();
+			con.setAutoCommit(false);
+			
+			String sql = "select JUMUN_no_seq.nextval cnt from dual";
+			pst = con.prepareStatement(sql);
+			ResultSet rs = pst.executeQuery();
+			int cnt = 41;
+			if(rs.next()) {
+				cnt = rs.getInt("cnt");
+			}
+			System.err.println(cnt);
+			rs.close();
+			pst.close();
+	
+			pst = con.prepareStatement(JumunSQL.JUMUN_INSERT);
+			pst.setInt(1, cnt);
+			pst.setString(2, jumun.j_name);
+			pst.setInt(3, jumun.j_total_qty);
+			pst.setInt(4, jumun.j_total_price);
+			pst.setString(5, jumun.m_id);
+			int insertRowCount = pst.executeUpdate();
+			pst.close();
+		
+			/* jumundetail */ 
+			pst = con.prepareStatement(JumunDetailSQL.JUMUNDETAIL_INSERT);
+			for(JumunDetail jumunDetail:jumun.jumunDetailList) {
+				pst.setInt(1, jumunDetail.getJd_item_qty());
+				pst.setInt(2, jumunDetail.getJd_items_price());
+				pst.setInt(3, cnt);
+				pst.setInt(4, jumunDetail.getP_no());
+				pst.executeUpdate();
+				pst.clearParameters();
+			}
+			
+			if(insertRowCount==1) {
+				isSuccess = true;
+			}
+			pst.close();
+			con.commit();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			isSuccess = false;
+			con.rollback();
+		}
+		return isSuccess;
+	}
+	
+	// INSERT INTO JUMUN VALUES(JUMUN_no_seq.nextval,?,?,?,SYSDATE,?)
+	@Override
+	public Jumun jumun_insert_directly(Jumun jumun) throws Exception {
+		boolean isSuccess = false;
+		Connection con = null;
+		PreparedStatement pst = null;
+		Jumun realJumun = new Jumun();
+		JumunDetail realJumunDetail = new JumunDetail();
+		ArrayList<JumunDetail> realJumunDetailList = new ArrayList<JumunDetail>();
+		
+		try {
+			con = dataSource.getConnection();
+			con.setAutoCommit(false);
+			
+			String sql = "select JUMUN_no_seq.nextval cnt from dual";
+			pst = con.prepareStatement(sql);
+			ResultSet rs = pst.executeQuery();
+			int cnt = 41;
+			if(rs.next()) {
+				cnt = rs.getInt("cnt");
+			}
+			System.err.println(cnt);
+			rs.close();
+			pst.close();
+	
+			pst = con.prepareStatement(JumunSQL.JUMUN_INSERT);
+			pst.setInt(1, cnt);
+			pst.setString(2, jumun.j_name);
+			pst.setInt(3, jumun.j_total_qty);
+			pst.setInt(4, jumun.j_total_price);
+			pst.setString(5, jumun.m_id);
+			int insertRowCount = pst.executeUpdate();
+			pst.close();
+		
+			/* jumundetail */ 
+			pst = con.prepareStatement(JumunDetailSQL.JUMUNDETAIL_INSERT);
+			for(JumunDetail jumunDetail:jumun.jumunDetailList) {
+				pst.setInt(1, jumunDetail.getJd_item_qty());
+				pst.setInt(2, jumunDetail.getJd_items_price());
+				pst.setInt(3, cnt);
+				pst.setInt(4, jumunDetail.getP_no());
+				pst.executeUpdate();
+				pst.clearParameters();
+			}
+			
+			if(insertRowCount==1) {
+				isSuccess = true;
+			}
+			pst.close();
+			
+			String sql1 = "select JUMUN_no_seq.currval cnt from dual";
+			pst = con.prepareStatement(sql1);
+			rs = pst.executeQuery();
+			if(rs.next()) {
+				cnt = rs.getInt("cnt");
+			}
+			System.err.println(cnt);
+			rs.close();
+			pst.close();
+			
+			pst = con.prepareStatement(JumunDetailSQL.JUMUNDETAIL_READ_JNO_CHECKOUT);
+			pst.setInt(1, cnt);
+			rs = pst.executeQuery();
+			
+			while(rs.next()) {
+				realJumunDetailList.add(new JumunDetail(rs.getInt("jd_no"), rs.getInt("jd_item_qty"),
+						rs.getInt("jd_items_price"), rs.getInt("j_no"), rs.getInt("p_no")));
+			}
+			
+			pst = con.prepareStatement(JumunSQL.JUMUN_readNO);
+			pst.setInt(1, cnt);
+			rs = pst.executeQuery();
+			
+			if(rs.next()) {
+				realJumun = new Jumun(rs.getInt("j_no"), rs.getString("j_name"), rs.getInt("j_total_qty"), rs.getInt("j_total_price"), rs.getDate("j_date"), rs.getString("m_id"), realJumunDetailList);
+			}
+			pst.close();
+			con.commit();
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			isSuccess = false;
+			con.rollback();
+		}
+		return realJumun;
+	}
+	
+	// SELECT * FROM JUMUN WHERE m_id = ?
+	@Override
+	public List<Jumun> jumun_readId(String m_id) throws Exception {
+		ArrayList<Jumun> jumunList = new ArrayList<Jumun>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(JumunSQL.JUMUN_readID);
+			pst.setString(1, m_id);
+			rs = pst.executeQuery();
+			
+			while(rs.next()) {
+				jumunList.add(new Jumun(rs.getInt("j_no"), rs.getString("j_name"), rs.getInt("j_total_qty"), rs.getInt("j_total_price"), rs.getDate("j_date"), rs.getString("m_id")));
+			}
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return jumunList;
+	}
+	
+	// SELECT * FROM JUMUN WHERE m_id = ?
+	
+	@Override
+	public Jumun jumun_readNo(int j_no) throws Exception {
+		Jumun jumun = null;
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pstmt = con.prepareStatement(JumunSQL.JUMUN_readNO);
+			pstmt.setInt(1, j_no);
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				jumun = new Jumun(rs.getInt("j_no"), rs.getString("j_name"), rs.getInt("j_total_qty"), rs.getInt("j_total_price"), rs.getDate("j_date"), rs.getString("m_id"));
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+
+		} finally {
+			if(rs != null)
+				rs.close();
+			if(pstmt != null)
+				pstmt.close();
+			if(con != null)
+				con.close();
+		}
+		
+		return jumun;
+	}
+
+	
+	// SELECT * FROM JUMUN
+	@Override
+	public List<Jumun> jumun_readAll() throws Exception {
+		ArrayList<Jumun> jumunList = new ArrayList<Jumun>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(JumunSQL.JUMUN_readAll);
+			rs = pst.executeQuery();
+			
+			while(rs.next()) {
+				jumunList.add(new Jumun(rs.getInt("j_no"), rs.getString("j_name"), rs.getInt("j_total_qty"), rs.getInt("j_total_price"), rs.getDate("j_date"), rs.getString("m_id")));
+			}
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return jumunList;
+	}
+	
+}

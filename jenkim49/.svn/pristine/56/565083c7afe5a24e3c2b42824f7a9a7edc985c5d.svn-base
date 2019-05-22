@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd">
+    <import resource="datasource-config.xml"/>
+    <!-- Uncomment and add your base-package here:
+         <context:component-scan
+            base-package="org.springframework.samples.service"/>  -->
+	
+	<!-- CART BEAN -->
+	<bean id="cartDao" class="jenkim49.cart.CartDaoImpl">
+		<property name="dataSource" ref="apacheDataSource"/>
+	</bean>
+	<bean id="cartService" class="jenkim49.cart.CartServiceImpl">
+		<property name="cartDao" ref="cartDao"/>
+	</bean>
+	
+	<!-- PRODUCT BEAN -->
+	<bean id="productDao" class="jenkim49.product.ProductDaoImpl">
+		<property name="dataSource" ref="apacheDataSource" />
+	</bean>
+	<bean id="productService"
+		class="jenkim49.product.ProductServiceImpl">
+		<property name="productDao" ref="productDao" />
+	</bean>
+	
+	<!-- transaction manager -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="apacheDataSource"/>
+	</bean>
+	<!-- transaction advice-->
+	<bean id="transactionAdvice" class="jenkim49.tag.TransactionAdvice">
+		<property name="manager" ref="transactionManager"/>
+	</bean>
+	
+	<aop:config>
+		<aop:aspect ref="transactionAdvice">
+			<aop:around method="doActionWithTransaction" 
+			  pointcut="execution(* jenkim49.tag.*Service.*(..))"/>
+		</aop:aspect>
+	</aop:config>
+</beans>

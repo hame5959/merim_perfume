@@ -1,0 +1,127 @@
+package jenkim49.survey.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import jenkim49.accord.Accord;
+import jenkim49.accord.AccordService;
+import jenkim49.survey.Survey;
+import jenkim49.survey.SurveyService;
+
+@Controller
+public class SurveyController {
+	private SurveyService surveyService;
+	private AccordService accordService;
+
+	public SurveyController() {
+		// TODO Auto-generated constructor stub
+	}
+
+	@Autowired
+	public void setSurveyService(SurveyService surveyService) {
+		this.surveyService = surveyService;
+	}
+
+	@Autowired
+	public void setAccordService(AccordService accordService) {
+		this.accordService = accordService;
+	}
+	
+	@RequestMapping("surveyformat")
+	public String survey() {
+		return "surveyformat";
+	}
+
+	@RequestMapping("1survey")
+	public String survey(Model model) {
+		String forwardPath = "";
+		try {
+			List<Accord> accordList = (List<Accord>) accordService.accord_readAll();
+			model.addAttribute("accordList", accordList);
+			forwardPath = "1survey";
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			forwardPath = "product_error";
+		}
+		return forwardPath;
+	}
+
+	@RequestMapping("survey_confirmation")
+	public String surveyConfirmation() {
+		return "survey_confirmation";
+	}
+
+	@RequestMapping("survey_list")
+	public String survey_list(Model model) {
+		String forwardPath = "";
+		try {
+			ArrayList<Survey> surveyList = (ArrayList<Survey>) surveyService.survey_readAll();
+			model.addAttribute("surveyList", surveyList);
+			forwardPath = "survey_list";
+		} catch (Exception e) {
+			e.printStackTrace();
+			forwardPath = "survey_error";
+		}
+		return forwardPath;
+	}
+	
+	@RequestMapping("survey_list_admin")
+	public @ResponseBody List<Survey> survey_list_admin(Model model) {
+		List<Survey> surveyList = new ArrayList<Survey>();
+		try {
+			surveyList = surveyService.survey_readAll();
+			model.addAttribute("surveyList", surveyList);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return surveyList;
+	}
+
+	@RequestMapping(value = "survey_insert_action", method = RequestMethod.GET)
+	public String survey_insert_action_get() {
+		String forwardPath = "";
+		forwardPath = "redirect:1survey";
+		return forwardPath;
+	}
+
+	@RequestMapping(value = "survey_insert_action", method = RequestMethod.POST)
+	public String survey_insert_action_post(@ModelAttribute Survey surveyResult) {
+		System.out.println(surveyResult);
+		Survey actualSurvey = new Survey(-999, surveyResult.getS_fav1(), surveyResult.getS_fav2(),
+				surveyResult.getS_fav3(), surveyResult.getS_age(), surveyResult.getS_gender(), surveyResult.getM_id());
+		System.out.println(actualSurvey);
+		String forwardPath = "";
+		boolean insertOK = false;
+		if (surveyResult.getM_id() == null || surveyResult.getM_id().equals("")) {
+			forwardPath = "redirect:index";
+		} else {
+			try {
+				insertOK = surveyService.survey_insert(actualSurvey);
+				if (insertOK) {
+					System.err.println(insertOK);
+					// forwardPath만 해결하면 됨
+					forwardPath = "survey_confirmation";
+				} else {
+					System.err.println(insertOK);
+					forwardPath = "product_error";
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				forwardPath = "product_error";
+			}
+		}
+		return forwardPath;
+
+	}
+
+}

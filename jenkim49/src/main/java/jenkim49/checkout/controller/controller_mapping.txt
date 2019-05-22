@@ -1,0 +1,7 @@
+<<요청command>>
+/checkout_readall
+/checkout_readone_by_no
+/checkout_readone_by_id
+/checkout_insert_action
+/checkout_update_action
+/checkout_delete_acton

@@ -1,0 +1,934 @@
+package jenkim49.product;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.tomcat.jdbc.pool.DataSource;
+
+import jenkim49.survey.Survey;
+
+public class ProductDaoImpl implements ProductDao {
+	
+	private DataSource dataSource;
+	
+	public ProductDaoImpl() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+	
+	
+	@Override
+	public boolean product_insert(Product product) throws Exception {
+		boolean isSuccess = false;
+		Connection con = null;
+		PreparedStatement pst = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSQL.PRODUCT_INSERT);
+		
+
+			pst.setString(1, product.p_category);
+			pst.setString(2, product.br_name);
+			pst.setString(3, product.p_name);
+			pst.setString(4, product.p_volume);
+			pst.setFloat(5, product.p_price);
+			pst.setString(6, product.p_image);
+			pst.setString(7, product.p_keyword);
+			pst.setString(8, product.p_des);
+			pst.setFloat(9, product.p_count);
+			pst.setString(10, product.t_name);
+			int insertRowCount = pst.executeUpdate();
+			if(insertRowCount==1) {
+				isSuccess=true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			isSuccess=false;
+		} finally {
+			if(con!=null) con.close();
+		}
+		return isSuccess;
+	}
+	
+	
+	
+	
+	
+	@Override
+	public boolean product_update(Product updateProduct) throws Exception{
+		boolean isSuccess = false;
+		Connection con = null;
+		PreparedStatement pst = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSQL.PRODUCT_UPDATE);
+			pst.setString(1, updateProduct.p_category);
+			pst.setString(2, updateProduct.br_name);
+			pst.setString(3, updateProduct.p_name);
+			pst.setString(4, updateProduct.p_volume);
+			pst.setFloat(5, updateProduct.p_price);
+			pst.setString(6, updateProduct.p_image);
+			pst.setString(7, updateProduct.p_keyword);
+			pst.setString(8, updateProduct.p_des);
+			pst.setFloat(9, updateProduct.p_count);
+			pst.setString(10, updateProduct.t_name);
+			pst.setInt(11, updateProduct.p_no);
+			int updateRowCount = pst.executeUpdate();
+			isSuccess=true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			isSuccess=false;
+		} 
+		return isSuccess;
+	}
+	
+	@Override
+	public boolean product_update(Float p_count, int p_no) throws Exception{
+		boolean isSuccess = false;
+		Connection con = null;
+		PreparedStatement pst = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSQL.PRODUCT_UPDATE_COUNT);
+			pst.setFloat(1, p_count);
+			pst.setInt(2, p_no);
+			int updateRowCount = pst.executeUpdate();
+			isSuccess=true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			isSuccess=false;
+		} 
+		return isSuccess;
+	}
+	
+	@Override
+	public boolean product_delete(int p_no) throws Exception {
+		boolean isSuccess = false;
+		Connection con = null;
+		PreparedStatement pst = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSQL.PRODUCT_DELETE);
+			pst.setInt(1, p_no);
+			int deleteRowCount = pst.executeUpdate();
+			isSuccess = true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			isSuccess = false;
+		}
+		return isSuccess;
+	}
+	
+	
+	
+	
+	
+	@Override
+	public List<Product> product_readAllMain() throws Exception {
+		ArrayList<Product> productList = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSQL.PRODUCT_READALLMAIN);
+			rs = pst.executeQuery();
+			
+			int count = 0;
+			while(rs.next() && count<4) {
+				productList.add(new Product(rs.getInt("p_no"), rs.getString("p_name"), rs.getFloat("p_price"), rs.getString("p_image")));
+				count++;
+			}
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return productList;
+	}
+	
+	
+	
+	
+	
+	@Override
+	public List<Product> product_readAllAdmin() throws Exception {
+		ArrayList<Product> productList = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSQL.PRODUCT_READALLADMIN);
+			rs = pst.executeQuery();
+			
+			while(rs.next()) {
+				productList.add(new Product( rs.getInt("p_no"),rs.getString("p_category"), rs.getString("br_name"),rs.getString("p_name"),
+						rs.getString("p_volume"), rs.getFloat("p_price"),
+						rs.getString("p_image"), rs.getString("p_keyword"), rs.getString("p_des"),rs.getFloat("p_count"),rs.getString("t_name") 
+						));
+			}
+			
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return productList;
+	}
+	
+	
+	
+	
+	
+	@Override
+	public Product product_readOne(int p_no) throws Exception {
+		Product product = null;
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSQL.PRODUCT_READONE);
+			pst.setInt(1, p_no);
+			rs = pst.executeQuery();
+			if(rs.next()) {
+				product =new Product(rs.getInt("p_no"), rs.getString("p_category"), rs.getString("br_name"),rs.getString("p_name"),
+						rs.getString("p_volume"), rs.getFloat("p_price"),
+						rs.getString("p_image"), rs.getString("p_keyword"), rs.getString("p_des"),rs.getFloat("p_count"),rs.getString("t_name") 
+						);
+			}
+		} finally {
+			if(con!=null) con.close();
+		}
+		return product;
+	}
+	
+	
+	
+	
+	
+	@Override
+	public List<Product> product_search(String p_name) throws Exception {
+		ArrayList<Product> searchProduct = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSQL.PRODUCT_SEARCH);
+			pst.setString(1, "%"+p_name+"%");
+			rs = pst.executeQuery();
+			
+			while(rs.next()) {
+				searchProduct.add(new Product(rs.getInt("p_no"), rs.getString("p_name"), rs.getFloat("p_price"), rs.getString("p_image")));
+			}
+			
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return searchProduct;
+	}
+	
+	
+	
+	
+	
+	@Override
+	public List<Product> product_survey_match(String m_id, String s_gender, String s_fav1, String s_fav2, String s_fav3, String s_age) throws Exception {
+		ArrayList<Product> product_survey_match = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSQL.PRODUCT_SURVEY_MATCH);
+			pst.setString(1, m_id);
+			System.err.println(m_id);
+			pst.setString(2, s_gender);
+			System.err.println(s_gender);
+			pst.setString(3,"%"+s_fav1+"%");
+			System.err.println(s_fav1);
+			pst.setString(4,"%"+s_fav2+"%");
+			System.err.println(s_fav2);
+			pst.setString(5, "%"+s_fav3+"%");
+			System.err.println(s_fav3);
+			pst.setString(6, "%"+s_age+"%");
+			System.err.println(s_age);
+			rs = pst.executeQuery();
+			int count = 0;
+			while(rs.next() && count<4) {
+				product_survey_match.add(new Product(rs.getInt("p_no"), rs.getString("p_name"), rs.getFloat("p_price"), rs.getString("p_image")));
+				count++;
+				
+			}
+		} catch (Exception e){
+			e.printStackTrace();
+		} finally {
+		
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return product_survey_match;
+	}
+	
+	@Override
+	public List<Product> product_recommend(String t_name) throws Exception {
+		ArrayList<Product> product_recommend = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSQL.PRODUCT_RECOMMEND);
+			pst.setString(1, t_name);
+			rs = pst.executeQuery();
+			int count = 0;
+			while(rs.next() && count<16) {
+				product_recommend.add(new Product(rs.getInt("p_no"), rs.getString("p_name"), rs.getFloat("p_price"), rs.getString("p_image")));
+				count++;
+			}
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return product_recommend;
+	}
+	
+	
+	
+	
+	
+	
+	
+	@Override
+	public List<Product> product_readAllPopular() throws Exception {
+		ArrayList<Product> productList = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+			
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSQL.PRODUCT_MOSTPOPULAR);
+			rs = pst.executeQuery();
+				
+			int count = 0;
+			while(rs.next() && count<4) {
+				productList.add(new Product(rs.getInt("p_no"), rs.getString("p_name"), rs.getFloat("p_price"), rs.getString("p_image")));
+				count++;
+			}
+				
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return productList;
+	}
+	
+	/********************************************************************************************************************
+	 * 1category_all, men, women = product category page */ 
+	
+	
+	
+	@Override
+	public int getProductCount() throws Exception {
+		int count = 0;
+		String sql = "select count(*) from product";
+		Connection con = null;
+		PreparedStatement pst = null;
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(sql);
+			ResultSet rs = pst.executeQuery();
+			if(rs.next()) {
+				count = rs.getInt("count(*)");
+			}
+			System.err.println(count);
+			rs.close();
+			pst.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			count = 0;
+			System.err.println("#error:"+count);
+		} finally {
+			if(con!=null) con.close();
+		}
+		return count;
+	}
+	
+	
+	
+	@Override
+	public int getProductCountMen() throws Exception {
+		int count = 0;
+		String sql = "select count(*) from product where p_category='남성향수'";
+		Connection con = null;
+		PreparedStatement pst = null;
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(sql);
+			ResultSet rs = pst.executeQuery();
+			if(rs.next()) {
+				count = rs.getInt("count(*)");
+			}
+			System.err.println(count);
+			rs.close();
+			pst.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			count = 0;
+			System.err.println("#error:"+count);
+		} finally {
+			if(con!=null) con.close();
+		}
+		return count;
+	}
+	
+	
+	
+	@Override
+	public int getProductCountWomen() throws Exception {
+		int count = 0;
+		String sql = "select count(*) from product where p_category='여성향수'";
+		Connection con = null;
+		PreparedStatement pst = null;
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(sql);
+			ResultSet rs = pst.executeQuery();
+			if(rs.next()) {
+				count = rs.getInt("count(*)");
+			}
+			System.err.println(count);
+			rs.close();
+			pst.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			count = 0;
+			System.err.println("#error:"+count);
+		} finally {
+			if(con!=null) con.close();
+		}
+		return count;
+	}
+	
+	
+	
+	@Override
+	public List<Product> product_readAllCategory(int startR, int endR) throws Exception {
+		ArrayList<Product> productList = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSortSQL.PRODUCT_READALLCATEGORY);
+			pst.setInt(1, startR);
+			pst.setInt(2, endR);
+			rs = pst.executeQuery();
+			
+			while(rs.next()) {
+				productList.add(new Product(rs.getInt("p_no"), rs.getString("p_category"), rs.getString("br_name"),rs.getString("p_name"),
+						rs.getString("p_volume"), rs.getFloat("p_price"),
+						rs.getString("p_image"), rs.getString("p_des"),rs.getFloat("p_count"),rs.getString("t_name")));
+			}
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return productList;
+	}
+	
+	
+	
+	@Override
+	public List<Product> product_readAllCategoryNameAsc(int startR, int endR) throws Exception {
+		ArrayList<Product> productList = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSortSQL.PRODUCT_READALLCATEGORYNAMEASC);
+			pst.setInt(1, startR);
+			pst.setInt(2, endR);
+			rs = pst.executeQuery();
+			
+			while(rs.next()) {
+				productList.add(new Product(rs.getInt("p_no"), rs.getString("p_category"), rs.getString("br_name"),rs.getString("p_name"),
+						rs.getString("p_volume"), rs.getFloat("p_price"),
+						rs.getString("p_image"), rs.getString("p_des"),rs.getFloat("p_count"),rs.getString("t_name")));
+			}
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return productList;
+	}
+	
+	
+	
+	@Override
+	public List<Product> product_readAllCategoryNameDesc(int startR, int endR) throws Exception {
+		ArrayList<Product> productList = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSortSQL.PRODUCT_READALLCATEGORYNAMEDESC);
+			pst.setInt(1, startR);
+			pst.setInt(2, endR);
+			rs = pst.executeQuery();
+			
+			while(rs.next()) {
+				productList.add(new Product(rs.getInt("p_no"), rs.getString("p_category"), rs.getString("br_name"),rs.getString("p_name"),
+						rs.getString("p_volume"), rs.getFloat("p_price"),
+						rs.getString("p_image"), rs.getString("p_des"),rs.getFloat("p_count"),rs.getString("t_name")));
+			}
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return productList;
+	}
+	
+	
+	
+	@Override
+	public List<Product> product_readAllCategoryPriceAsc(int startR, int endR) throws Exception {
+		ArrayList<Product> productList = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSortSQL.PRODUCT_READALLCATEGORYPRICEASC);
+			pst.setInt(1, startR);
+			pst.setInt(2, endR);
+			rs = pst.executeQuery();
+			
+			while(rs.next()) {
+				productList.add(new Product(rs.getInt("p_no"), rs.getString("p_category"), rs.getString("br_name"),rs.getString("p_name"),
+						rs.getString("p_volume"), rs.getFloat("p_price"),
+						rs.getString("p_image"), rs.getString("p_des"),rs.getFloat("p_count"),rs.getString("t_name")));
+			}
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return productList;
+	}
+	
+	
+	
+	@Override
+	public List<Product> product_readAllCategoryPriceDesc(int startR, int endR) throws Exception {
+		ArrayList<Product> productList = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSortSQL.PRODUCT_READALLCATEGORYPRICEDESC);
+			pst.setInt(1, startR);
+			pst.setInt(2, endR);
+			rs = pst.executeQuery();
+			
+			while(rs.next()) {
+				productList.add(new Product(rs.getInt("p_no"), rs.getString("p_category"), rs.getString("br_name"),rs.getString("p_name"),
+						rs.getString("p_volume"), rs.getFloat("p_price"),
+						rs.getString("p_image"), rs.getString("p_des"),rs.getFloat("p_count"),rs.getString("t_name")));
+			}
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return productList;
+	}
+	
+	
+	
+	@Override
+	public List<Product> product_readAllCategoryPopular(int startR, int endR) throws Exception {
+		ArrayList<Product> productList = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSortSQL.PRODUCT_READALLCATEGORYPOPULAR);
+			pst.setInt(1, startR);
+			pst.setInt(2, endR);
+			rs = pst.executeQuery();
+			
+			while(rs.next()) {
+				productList.add(new Product(rs.getInt("p_no"), rs.getString("p_category"), rs.getString("br_name"),rs.getString("p_name"),
+						rs.getString("p_volume"), rs.getFloat("p_price"),
+						rs.getString("p_image"), rs.getString("p_des"),rs.getFloat("p_count"),rs.getString("t_name")));
+			}
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return productList;
+	}
+	
+	@Override
+	public List<Product> product_readFemaleCategory(int endR, int startR) throws Exception {
+		ArrayList<Product> productList = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSortSQL.PRODUCT_READFEMALECATEGORY);
+			pst.setInt(1, endR);
+			pst.setInt(2, startR);
+			rs = pst.executeQuery();
+			
+			while(rs.next() ) {
+				productList.add(new Product(rs.getInt("p_no"), rs.getString("p_category"), rs.getString("br_name"),rs.getString("p_name"),
+						rs.getString("p_volume"), rs.getFloat("p_price"),
+						rs.getString("p_image"), rs.getString("p_des"),rs.getFloat("p_count"),rs.getString("t_name")));
+			}
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return productList;
+	}
+	
+	@Override
+	public List<Product> product_readFemaleCategoryNameAsc(int endR, int startR) throws Exception {
+		ArrayList<Product> productList = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSortSQL.PRODUCT_READFEMALECATEGORYNAMEASC);
+			pst.setInt(1, endR);
+			pst.setInt(2, startR);
+			rs = pst.executeQuery();
+			
+			while(rs.next() ) {
+				productList.add(new Product(rs.getInt("p_no"), rs.getString("p_category"), rs.getString("br_name"),rs.getString("p_name"),
+						rs.getString("p_volume"), rs.getFloat("p_price"),
+						rs.getString("p_image"), rs.getString("p_des"),rs.getFloat("p_count"),rs.getString("t_name")));
+			}
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return productList;
+	}@Override
+	public List<Product> product_readFemaleCategoryNameDesc(int endR, int startR) throws Exception {
+		ArrayList<Product> productList = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSortSQL.PRODUCT_READFEMALECATEGORYNAMEDESC);
+			pst.setInt(1, endR);
+			pst.setInt(2, startR);
+			rs = pst.executeQuery();
+			
+			while(rs.next() ) {
+				productList.add(new Product(rs.getInt("p_no"), rs.getString("p_category"), rs.getString("br_name"),rs.getString("p_name"),
+						rs.getString("p_volume"), rs.getFloat("p_price"),
+						rs.getString("p_image"), rs.getString("p_des"),rs.getFloat("p_count"),rs.getString("t_name")));
+			}
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return productList;
+	}
+	
+	@Override
+	public List<Product> product_readFemaleCategoryPriceAsc(int endR, int startR) throws Exception {
+		ArrayList<Product> productList = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSortSQL.PRODUCT_READFEMALECATEGORYPRICEASC);
+			pst.setInt(1, endR);
+			pst.setInt(2, startR);
+			rs = pst.executeQuery();
+			
+			while(rs.next() ) {
+				productList.add(new Product(rs.getInt("p_no"), rs.getString("p_category"), rs.getString("br_name"),rs.getString("p_name"),
+						rs.getString("p_volume"), rs.getFloat("p_price"),
+						rs.getString("p_image"), rs.getString("p_des"),rs.getFloat("p_count"),rs.getString("t_name")));
+			}
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return productList;
+	}
+	
+	@Override
+	public List<Product> product_readFemaleCategoryPriceDesc(int endR, int startR) throws Exception {
+		ArrayList<Product> productList = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSortSQL.PRODUCT_READFEMALECATEGORYPRICEDESC);
+			pst.setInt(1, endR);
+			pst.setInt(2, startR);
+			rs = pst.executeQuery();
+			
+			while(rs.next() ) {
+				productList.add(new Product(rs.getInt("p_no"), rs.getString("p_category"), rs.getString("br_name"),rs.getString("p_name"),
+						rs.getString("p_volume"), rs.getFloat("p_price"),
+						rs.getString("p_image"), rs.getString("p_des"),rs.getFloat("p_count"),rs.getString("t_name")));
+			}
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return productList;
+	}
+	
+	@Override
+	public List<Product> product_readFemaleCategoryPopular(int endR, int startR) throws Exception {
+		ArrayList<Product> productList = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSortSQL.PRODUCT_READFEMALECATEGORYPOPULAR);
+			pst.setInt(1, endR);
+			pst.setInt(2, startR);
+			rs = pst.executeQuery();
+			
+			while(rs.next() ) {
+				productList.add(new Product(rs.getInt("p_no"), rs.getString("p_category"), rs.getString("br_name"),rs.getString("p_name"),
+						rs.getString("p_volume"), rs.getFloat("p_price"),
+						rs.getString("p_image"), rs.getString("p_des"),rs.getFloat("p_count"),rs.getString("t_name")));
+			}
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return productList;
+	}
+	
+	@Override
+	public List<Product> product_readMaleCategory(int endR, int startR) throws Exception {
+		ArrayList<Product> productList = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSortSQL.PRODUCT_READMALECATEGORY);
+			pst.setInt(1, endR);
+			pst.setInt(2, startR);
+			rs = pst.executeQuery();
+			
+			while(rs.next()) {
+				productList.add(new Product(rs.getInt("p_no"), rs.getString("p_category"), rs.getString("br_name"),rs.getString("p_name"),
+						rs.getString("p_volume"), rs.getFloat("p_price"),
+						rs.getString("p_image"), rs.getString("p_des"),rs.getFloat("p_count"),rs.getString("t_name")));
+			}
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return productList;
+	}
+	
+	@Override
+	public List<Product> product_readMaleCategoryNameAsc(int endR, int startR) throws Exception {
+		ArrayList<Product> productList = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSortSQL.PRODUCT_READMALECATEGORY);
+			pst.setInt(1, endR);
+			pst.setInt(2, startR);
+			rs = pst.executeQuery();
+			
+			while(rs.next()) {
+				productList.add(new Product(rs.getInt("p_no"), rs.getString("p_category"), rs.getString("br_name"),rs.getString("p_name"),
+						rs.getString("p_volume"), rs.getFloat("p_price"),
+						rs.getString("p_image"), rs.getString("p_des"),rs.getFloat("p_count"),rs.getString("t_name")));
+			}
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return productList;
+	}
+	
+	@Override
+	public List<Product> product_readMaleCategoryNameDesc(int endR, int startR) throws Exception {
+		ArrayList<Product> productList = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSortSQL.PRODUCT_READMALECATEGORYNAMEDESC);
+			pst.setInt(1, endR);
+			pst.setInt(2, startR);
+			rs = pst.executeQuery();
+			
+			while(rs.next()) {
+				productList.add(new Product(rs.getInt("p_no"), rs.getString("p_category"), rs.getString("br_name"),rs.getString("p_name"),
+						rs.getString("p_volume"), rs.getFloat("p_price"),
+						rs.getString("p_image"), rs.getString("p_des"),rs.getFloat("p_count"),rs.getString("t_name")));
+			}
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return productList;
+	}
+	
+	@Override
+	public List<Product> product_readMaleCategoryPriceAsc(int endR, int startR) throws Exception {
+		ArrayList<Product> productList = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSortSQL.PRODUCT_READMALECATEGORYPRICEASC);
+			pst.setInt(1, endR);
+			pst.setInt(2, startR);
+			rs = pst.executeQuery();
+			
+			while(rs.next()) {
+				productList.add(new Product(rs.getInt("p_no"), rs.getString("p_category"), rs.getString("br_name"),rs.getString("p_name"),
+						rs.getString("p_volume"), rs.getFloat("p_price"),
+						rs.getString("p_image"), rs.getString("p_des"),rs.getFloat("p_count"),rs.getString("t_name")));
+			}
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return productList;
+	}
+	
+	
+	@Override
+	public List<Product> product_readMaleCategoryPriceDesc(int endR, int startR) throws Exception {
+		ArrayList<Product> productList = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSortSQL.PRODUCT_READMALECATEGORYPRICEDESC);
+			pst.setInt(1, endR);
+			pst.setInt(2, startR);
+			rs = pst.executeQuery();
+			
+			while(rs.next()) {
+				productList.add(new Product(rs.getInt("p_no"), rs.getString("p_category"), rs.getString("br_name"),rs.getString("p_name"),
+						rs.getString("p_volume"), rs.getFloat("p_price"),
+						rs.getString("p_image"), rs.getString("p_des"),rs.getFloat("p_count"),rs.getString("t_name")));
+			}
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return productList;
+	}
+	
+	@Override
+	public List<Product> product_readMaleCategoryPopular(int endR, int startR) throws Exception {
+		ArrayList<Product> productList = new ArrayList<Product>();
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		
+		try {
+			con = dataSource.getConnection();
+			pst = con.prepareStatement(ProductSortSQL.PRODUCT_READMALECATEGORYPOPULAR);
+			pst.setInt(1, endR);
+			pst.setInt(2, startR);
+			rs = pst.executeQuery();
+			
+			while(rs.next()) {
+				productList.add(new Product(rs.getInt("p_no"), rs.getString("p_category"), rs.getString("br_name"),rs.getString("p_name"),
+						rs.getString("p_volume"), rs.getFloat("p_price"),
+						rs.getString("p_image"), rs.getString("p_des"),rs.getFloat("p_count"),rs.getString("t_name")));
+			}
+		} finally {
+			if(rs!=null) rs.close();
+			if(pst!=null) pst.close();
+			if(con!=null) con.close();
+		}
+		return productList;
+	}
+	
+}

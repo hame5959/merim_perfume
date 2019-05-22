@@ -1,0 +1,112 @@
+
+function search() {
+	document.searchB.action="product_search";
+	document.searchB.mehod='POST';
+	document.searchB.submit();
+
+}
+
+function productCreateForm() {
+	document.f.action = 'product_write_form';
+	document.f.submit();
+}
+function productModifyAction() {
+	document.f.action = "product_update_action";
+	document.f.method='POST';
+	document.f.submit();
+}
+function productList() {
+	document.f.action = "product_list";
+	document.f.submit();
+}
+
+function productModify() {
+	document.f.action = "product_update_form";
+	document.f.method='POST';
+	document.f.submit();
+}
+
+function productRemove() {
+	if (window.confirm("정말 삭제하시겠습니까?")) {
+		document.f.action = "product_delete_action";
+		document.f.method = 'POST';
+		document.f.submit();
+	}
+}
+
+function productCreate() {
+	document.f.action = "product_write_action";
+	document.f.method='POST';
+	document.f.submit();
+}
+function BuyNow() {
+	document.b.action = "jumun_insert_action_directly";
+	document.b.method='POST';
+	document.b.submit();
+}
+//------- Start Quantity Increase & Decrease Value --------//
+
+function addComma(num) {
+	  var regexp = /\B(?=(\d{3})+(?!\d))/g;
+	  return num.toString().replace(regexp, ',');
+	}
+
+
+var value,
+    quantity = document.getElementsByClassName('quantity-container');
+
+
+
+function createBindings(quantityContainer) {
+    var quantityAmount = quantityContainer.getElementsByClassName('quantity-amount')[0];
+    var increase = quantityContainer.getElementsByClassName('increase')[0];
+    var decrease = quantityContainer.getElementsByClassName('decrease')[0];
+   
+    increase.addEventListener('click', function ()
+    		{
+    	increaseValue(quantityAmount);
+    	
+    	});
+    decrease.addEventListener('click', function () {
+    	decreaseValue(quantityAmount); 
+    	});
+}
+
+function init() {
+    for (var i = 0; i < quantity.length; i++ ) {
+        createBindings(quantity[i]);
+  
+    }
+};
+
+function increaseValue(quantityAmount) {
+	//alert(quantityAmount,priceAmount);
+	//alert(quantity,price);
+	value = parseInt(quantityAmount.value, 10);
+
+
+    value = isNaN(value) ? 0 : value;
+    value++;
+    
+    quantityAmount.value = value;
+
+
+
+}
+
+function decreaseValue(quantityAmount) {
+	//alert(quantityAmount,priceAmount);
+	//alert(quantity,price);
+	value = parseInt(quantityAmount.value, 10);
+	
+    console.log(quantityAmount, quantityAmount.value);
+   
+  
+    value = isNaN(value) ? 0 : value;
+    if (value > 1) value--;
+    
+    quantityAmount.value = value;
+
+}
+init();
+

@@ -1,0 +1,10 @@
+<<요청command>>
+
+/brand_list.do
+/brand_view.do
+/brand_write_form.do
+/brand_write_action.do
+/brand_modify_form.do
+/brand_modify_action.do
+/brand_delete_action.do
+/brand_error.do
